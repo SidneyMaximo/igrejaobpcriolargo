@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" width="1200" height="1600">
+  <defs>
+    <!-- Rich Royal Blue Background Gradient matching OBPC official visual identity -->
+    <linearGradient id="obpcRoyalGrad" x1="15%" y1="0%" x2="85%" y2="100%">
+      <stop offset="0%" stop-color="#123ea8"/>
+      <stop offset="25%" stop-color="#0e328e"/>
+      <stop offset="55%" stop-color="#082269"/>
+      <stop offset="80%" stop-color="#05164a"/>
+      <stop offset="100%" stop-color="#020b29"/>
+    </linearGradient>
+
+    <!-- Upper Center Radial Glow -->
+    <radialGradient id="upperGlow" cx="40%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.32"/>
+      <stop offset="50%" stop-color="#0e328e" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#020b29" stop-opacity="0"/>
+    </radialGradient>
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&amp;display=swap');
+      .script-watermark {
+        font-family: 'Great Vibes', 'Brush Script MT', 'Segoe Script', cursive;
+        font-size: 38px;
+        fill: #93c5fd;
+        fill-opacity: 0.14;
+        letter-spacing: 2px;
+      }
+      .script-watermark-offset {
+        font-family: 'Great Vibes', 'Brush Script MT', 'Segoe Script', cursive;
+        font-size: 38px;
+        fill: #93c5fd;
+        fill-opacity: 0.12;
+        letter-spacing: 2px;
+      }
+    </style>
+
+    <!-- Repeating Watermark Script Pattern -->
+    <pattern id="despertaScriptGrid" width="650" height="120" patternUnits="userSpaceOnUse">
+      <!-- Line 1 -->
+      <text x="-50" y="45" class="script-watermark">
+        Desperta Brasil  Desperta Brasil  Desperta Brasil  Desperta Brasil
+      </text>
+      <!-- Line 2 (Staggered Offset) -->
+      <text x="-180" y="105" class="script-watermark-offset">
+        Desperta Brasil  Desperta Brasil  Desperta Brasil  Desperta Brasil
+      </text>
+    </pattern>
+  </defs>
+
+  <!-- 1. Deep Blue Canvas Base -->
+  <rect width="1200" height="1600" fill="url(#obpcRoyalGrad)" />
+  <rect width="1200" height="1600" fill="url(#upperGlow)" />
+
+  <!-- 2. "Desperta Brasil" Calligraphy Watermark Layer across entire canvas -->
+  <rect width="1200" height="1600" fill="url(#despertaScriptGrid)" />
+
+  <!-- 3. Giant Central OBPC Emblem Watermark (Stylized Eagle/Flag Wave & Circle) -->
+  <g transform="translate(180, 520) scale(2.2)" fill="#93c5fd" fill-opacity="0.13" stroke="#60a5fa" stroke-opacity="0.08" stroke-width="1.5">
+    <!-- Dynamic flag wave / eagle swoosh -->
+    <path d="M 30 200 C 60 120, 140 60, 240 30 C 180 65, 130 110, 110 160 C 160 100, 230 70, 310 50 C 240 90, 190 150, 175 220 C 130 210, 80 205, 30 200 Z" />
+    
+    <!-- Inner yellow wing curve silhouette -->
+    <path d="M 110 160 C 130 110, 180 65, 240 30 C 255 65, 260 110, 250 155 C 205 160, 155 162, 110 160 Z" />
+
+    <!-- Center globe circle -->
+    <circle cx="235" cy="150" r="42" />
+    
+    <!-- White celestial band through globe -->
+    <path d="M 198 165 C 215 145, 245 138, 274 135 C 275 140, 273 146, 268 150 C 248 152, 222 160, 198 175 Z" fill="#ffffff" fill-opacity="0.22" />
+  </g>
+
+</svg>

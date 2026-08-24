@@ -1,0 +1,6 @@
+{
+  "name": "Igreja O Brasil Para Cristo",
+  "description": "Portal oficial da Igreja O Brasil Para Cristo com programações, eventos, galeria de fotos e vídeos, painel de liderança e CRM financeiro seguro de dízimos e ofertas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,734 @@
+import {
+  ChurchInfo,
+  WeeklySchedule,
+  ChurchEvent,
+  MediaFolder,
+  MediaItem,
+  PrayerRequest,
+  ChurchMember,
+  FinancialTransaction,
+  SystemUser,
+  AuditLog
+} from '../types';
+
+export const INITIAL_CHURCH_INFO: ChurchInfo = {
+  name: 'Igreja O Brasil Para Cristo',
+  subtitle: 'Uma Família que Ama a Deus, Serve ao Próximo e Vive a Palavra',
+  pastorName: 'Pr. Carlos Eduardo e Pra. Marlene Ramos',
+  vicePastorName: 'Pr. Marcos Vinicius',
+  address: 'Av. das Nações Unidas, 1420 - Bairro Central',
+  cityState: 'São Paulo - SP',
+  zipCode: '01310-200',
+  phone: '(11) 3214-8800',
+  whatsapp: '(11) 99876-5432',
+  email: 'contato@obrasilparacristo.org.br',
+  pixKey: '82999694402',
+  pixKeyType: 'Telefone',
+  pixRecipient: 'Igreja O Brasil Para Cristo',
+  bankName: 'Banco Bradesco (237)',
+  bankAgency: '1452-9',
+  bankAccount: '25480-1',
+  youtubeChannelUrl: 'https://youtube.com/@obpcriolargo',
+  instagramUrl: 'https://instagram.com/obpcriolargo',
+  facebookUrl: 'https://facebook.com',
+  liveStreamUrl: 'https://youtube.com/@obpcriolargo/live',
+  historyText: 'Fundada pelo missionário Manoel de Mello em 1956, a Igreja O Brasil Para Cristo é um ministério de fé, avivamento pentecostal, evangelização vibrante e profundo compromisso social. Nosso propósito é levar a salvação em Cristo a cada lar e transformar vidas pelo poder do Evangelho.'
+};
+
+export const INITIAL_SCHEDULES: WeeklySchedule[] = [
+  {
+    id: 'sch-1',
+    dayOfWeek: 'Segunda',
+    time: '19:00',
+    title: 'Círculo de Oração',
+    ministry: 'UFEBRAC / Intercessão',
+    description: 'Momento de clamor, oração e busca pelo poder de Deus na congregação Forene.',
+    leader: 'Liderança Círculo de Oração',
+    location: 'Forene',
+    iconName: 'flame',
+    colorTag: 'rose',
+    order: 1
+  },
+  {
+    id: 'sch-2',
+    dayOfWeek: 'Terça',
+    time: '19:30',
+    title: 'Círculo de Oração',
+    ministry: 'UFEBRAC / Intercessão Geral',
+    description: 'Encontro de clamor e intercessão pelas famílias, enfermos e causas especiais no templo sede.',
+    leader: 'Liderança Círculo de Oração',
+    location: 'Sede',
+    iconName: 'flame',
+    colorTag: 'rose',
+    order: 2
+  },
+  {
+    id: 'sch-3',
+    dayOfWeek: 'Quarta',
+    time: '19:30',
+    title: 'Culto da ADOBRAC',
+    ministry: 'ADOBRAC (Adolescentes O Brasil Para Cristo)',
+    description: 'Culto vibrante com louvor, dinâmica bíblica e ministração direcionada aos adolescentes no templo sede.',
+    leader: 'Liderança ADOBRAC',
+    location: 'Sede',
+    iconName: 'zap',
+    colorTag: 'amber',
+    order: 3
+  },
+  {
+    id: 'sch-4',
+    dayOfWeek: 'Quinta',
+    time: '19:30',
+    title: 'Culto da ADOBRAC',
+    ministry: 'ADOBRAC (Adolescentes O Brasil Para Cristo)',
+    description: 'Louvor congregacional, adoração e comunhão para os adolescentes na congregação Forene.',
+    leader: 'Liderança ADOBRAC',
+    location: 'Forene',
+    iconName: 'zap',
+    colorTag: 'amber',
+    order: 4
+  },
+  {
+    id: 'sch-5',
+    dayOfWeek: 'Sábado',
+    time: '19:30',
+    title: 'Culto de Ensino',
+    ministry: 'Ministério de Ensino & Doutrina',
+    description: 'Estudo aprofundado das Sagradas Escrituras, doutrina bíblica e fortalecimento espiritual no templo sede.',
+    leader: 'Ministério Pastoral & Ensino',
+    location: 'Sede',
+    iconName: 'book-open',
+    colorTag: 'blue',
+    order: 5
+  },
+  {
+    id: 'sch-6',
+    dayOfWeek: 'Domingo',
+    time: '05:00',
+    title: 'Sala de Oração',
+    ministry: 'Intercessão & Clamor Matinal',
+    description: 'Oração e consagração ao romper da aurora, buscando a presença do Senhor no templo sede.',
+    leader: 'Ministério de Oração',
+    location: 'Sede',
+    iconName: 'sparkles',
+    colorTag: 'indigo',
+    order: 6
+  },
+  {
+    id: 'sch-7',
+    dayOfWeek: 'Domingo',
+    time: '18:00',
+    title: 'Culto da Família',
+    ministry: 'Ministério Pastoral & Famílias',
+    description: 'Grande culto dominical com louvor congregacional, ministração da Palavra e bênção para os lares na Forene.',
+    leader: 'Liderança Local Forene',
+    location: 'Forene',
+    iconName: 'heart-handshake',
+    colorTag: 'emerald',
+    order: 7
+  },
+  {
+    id: 'sch-8',
+    dayOfWeek: 'Domingo',
+    time: '19:00',
+    title: 'Culto da UMASBRAC',
+    ministry: 'UMASBRAC (Homens de Honra) & Celebração',
+    description: 'Celebração congregacional com louvor, ministração bíblica e consagração das famílias no templo sede.',
+    leader: 'Liderança UMASBRAC & Pastoral',
+    location: 'Sede',
+    iconName: 'shield',
+    colorTag: 'purple',
+    order: 8
+  }
+];
+
+export const INITIAL_EVENTS: ChurchEvent[] = [
+  {
+    id: 'evt-1',
+    title: 'Grande Congresso Estadual da Família 2026',
+    subtitle: 'Edificando Lares Inabaláveis sobre a Rocha',
+    date: '2026-09-18',
+    endDate: '2026-09-20',
+    time: '19:00',
+    location: 'Templo Sede OBPC Central',
+    description: 'Três dias de avivamento com palestras especiais sobre casamento, criação de filhos na era digital, saúde emocional e finanças à luz da Bíblia.',
+    bannerUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1200&q=80',
+    category: 'Congresso',
+    highlight: true,
+    registrationOpen: true,
+    registrationLimit: 450,
+    registeredCount: 238,
+    guestSpeaker: 'Pr. Josué Gonçalves e Pastores Convidados',
+    musicalGuest: 'Ministério de Louvor Voz da Esperança'
+  },
+  {
+    id: 'evt-2',
+    title: 'Conferência Missionária & Ação Social "Mãos que Acolhem"',
+    subtitle: 'Até os Confins da Terra e no Nosso Bairro',
+    date: '2026-09-05',
+    endDate: '2026-09-06',
+    time: '09:00',
+    location: 'Quadra Esportiva & Templo Sede',
+    description: 'Mutirão com atendimento odontológico, médico gratuito, corte de cabelo, distribuição de 300 cestas básicas e noites de testemunhos impactantes de missionários no sertão e no exterior.',
+    bannerUrl: 'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=1200&q=80',
+    category: 'Missões',
+    highlight: true,
+    registrationOpen: true,
+    registrationLimit: 500,
+    registeredCount: 312,
+    guestSpeaker: 'Missionário Daniel Souza (África) & Equipe OBPC',
+    musicalGuest: 'Coral Som do Céu'
+  },
+  {
+    id: 'evt-3',
+    title: 'Grande Vigília do Avivamento & Pentecostes',
+    subtitle: 'Buscando a Presença e o Fogo do Espírito Santo',
+    date: '2026-09-25',
+    time: '22:30 - 05:00',
+    location: 'Templo Sede',
+    description: 'Madrugada inteira de adoração contínua, oração em línguas, intercessão pelo Brasil, quebra de maldições e ministração da Santa Ceia da Vitória na alvorada.',
+    bannerUrl: 'https://images.unsplash.com/photo-1510525009512-ab7522cabb6b?auto=format&fit=crop&w=1200&q=80',
+    category: 'Vigília',
+    highlight: false,
+    registrationOpen: false,
+    registeredCount: 0,
+    guestSpeaker: 'Pr. Carlos Eduardo & Evangelistas'
+  },
+  {
+    id: 'evt-4',
+    title: 'Batismo nas Águas & Celebração dos Novos Convertidos',
+    subtitle: 'Sepultando o velho homem e nascendo de novo',
+    date: '2026-10-04',
+    time: '10:00',
+    location: 'Sítio Recanto de Canaã (Transporte sairá da Igreja)',
+    description: 'Festa espiritual com batismo por imersão dos novos irmãos que desceram às águas, seguido de almoço comunitário de confraternização fraterna.',
+    bannerUrl: 'https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1200&q=80',
+    category: 'Batismo',
+    highlight: false,
+    registrationOpen: true,
+    registrationLimit: 80,
+    registeredCount: 42,
+    guestSpeaker: 'Corpo Pastoral OBPC'
+  }
+];
+
+export const INITIAL_MEDIA_FOLDERS: MediaFolder[] = [
+  {
+    id: 'fol-1',
+    name: 'Congresso de Mulheres - UFEBRAC 2026',
+    description: 'Fotos e momentos marcantes do 24º Congresso de Mulheres Vitoriosas.',
+    category: 'Congressos e Conferências',
+    coverUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80',
+    eventDate: '2026-07-20',
+    itemCount: 8,
+    createdAt: '2026-07-22'
+  },
+  {
+    id: 'fol-2',
+    name: 'Culto de Celebração & Santa Ceia do Senhor',
+    description: 'Registro do primeiro domingo do mês em comunhão e adoração ao Cordeiro.',
+    category: 'Cultos e Celebrações',
+    coverUrl: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=800&q=80',
+    eventDate: '2026-08-02',
+    itemCount: 6,
+    createdAt: '2026-08-03'
+  },
+  {
+    id: 'fol-3',
+    name: 'Ação Social Sopão da Paz & Doação de Roupas',
+    description: 'Evangelismo em ação levando alimento e o amor de Cristo à comunidade carente.',
+    category: 'Ação Social',
+    coverUrl: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=800&q=80',
+    eventDate: '2026-08-15',
+    itemCount: 5,
+    createdAt: '2026-08-16'
+  },
+  {
+    id: 'fol-4',
+    name: 'Acampamento Jovem Geração Forte',
+    description: 'Três dias de ministrações, dinâmicas esportivas e muita presença de Deus.',
+    category: 'Juventude e Crianças',
+    coverUrl: 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=800&q=80',
+    eventDate: '2026-06-12',
+    itemCount: 7,
+    createdAt: '2026-06-15'
+  }
+];
+
+export const INITIAL_MEDIA_ITEMS: MediaItem[] = [
+  {
+    id: 'med-1',
+    folderId: 'fol-1',
+    title: 'Abertura Triunfal do Congresso das Irmãs',
+    type: 'image',
+    url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1200&q=80',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=400&q=80',
+    description: 'Entrada com estandartes e louvor congregacional.',
+    date: '2026-07-20',
+    featured: true
+  },
+  {
+    id: 'med-2',
+    folderId: 'fol-1',
+    title: 'Ministração da Palavra com Pra. Marlene',
+    type: 'image',
+    url: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1200&q=80',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=400&q=80',
+    description: 'Momento de forte unção e derramar de Deus.',
+    date: '2026-07-20',
+    featured: true
+  },
+  {
+    id: 'med-3',
+    folderId: 'fol-1',
+    title: 'Vídeo: Melhores Momentos do Congresso Feminino',
+    type: 'video',
+    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Clean sample playable
+    thumbnailUrl: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80',
+    description: 'Resumo oficial produzido pela equipe de mídia OBPC.',
+    date: '2026-07-21',
+    featured: true
+  },
+  {
+    id: 'med-4',
+    folderId: 'fol-2',
+    title: 'Ministração da Santa Ceia pelo Pastor Presidente',
+    type: 'image',
+    url: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=1200&q=80',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=400&q=80',
+    description: 'O pão e o cálice repartidos em reverência e gratidão.',
+    date: '2026-08-02',
+    featured: true
+  },
+  {
+    id: 'med-5',
+    folderId: 'fol-2',
+    title: 'Coral Louvor Celestial em Adoração',
+    type: 'image',
+    url: 'https://images.unsplash.com/photo-1519744346861-a590c2941328?auto=format&fit=crop&w=1200&q=80',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1519744346861-a590c2941328?auto=format&fit=crop&w=400&q=80',
+    description: 'Cânticos que tocaram os corações da igreja reunida.',
+    date: '2026-08-02',
+    featured: false
+  },
+  {
+    id: 'med-6',
+    folderId: 'fol-3',
+    title: 'Entrega de Alimentos e Oração com as Famílias',
+    type: 'image',
+    url: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=1200&q=80',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=400&q=80',
+    description: 'Mais de 180 refeições servidas com amor e carinho.',
+    date: '2026-08-15',
+    featured: true
+  },
+  {
+    id: 'med-7',
+    folderId: 'fol-4',
+    title: 'Vídeo: Clipes do Acampamento Jovem Geração Forte',
+    type: 'video',
+    url: 'https://www.youtube.com/watch?v=ScMzIvxBSi4',
+    thumbnailUrl: 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=600&q=80',
+    description: 'Vigília ao redor da fogueira e batismo com o Espírito Santo.',
+    date: '2026-06-14',
+    featured: true
+  }
+];
+
+export const INITIAL_PRAYER_REQUESTS: PrayerRequest[] = [
+  {
+    id: 'pray-1',
+    name: 'Irmã Maria de Lourdes',
+    phone: '(11) 98451-2299',
+    isConfidential: false,
+    requestType: 'Saúde',
+    message: 'Peço oração por meu esposo João que fará cirurgia no coração na próxima sexta-feira. Cremos no milagre e nas mãos do Senhor Jesus.',
+    status: 'em_oracao',
+    createdAt: '2026-08-22 14:20',
+    pastorNotes: 'Colocado na lista do Círculo de Oração e cultos de libertação.'
+  },
+  {
+    id: 'pray-2',
+    name: 'Fiel Anônimo (Membro)',
+    phone: '',
+    isConfidential: true,
+    requestType: 'Família',
+    message: 'Gostaria de pedir oração pelo meu casamento e pela restauração do meu filho que se afastou dos caminhos do Senhor. Rogo sigilo pastoral.',
+    status: 'em_oracao',
+    createdAt: '2026-08-23 09:15',
+    pastorNotes: 'Atendimento pastoral agendado com discrição total.'
+  },
+  {
+    id: 'pray-3',
+    name: 'Renato Guimarães',
+    phone: '(11) 97722-1100',
+    isConfidential: false,
+    requestType: 'Financeiro',
+    message: 'Estou em busca de recolocação profissional após 8 meses. Peço que a igreja ore para que Deus abra portas de emprego.',
+    status: 'pendente',
+    createdAt: '2026-08-24 08:30'
+  }
+];
+
+export const INITIAL_MEMBERS: ChurchMember[] = [
+  {
+    id: 'mbr-1',
+    sigiloCode: 'MBR-2024-001',
+    name: 'Sebastião Alves Moreira',
+    phone: '(11) 98111-2233',
+    email: 'sebastiao.moreira@email.com',
+    address: 'Rua das Flores, 145 - Jd. Esperança',
+    baptismDate: '2015-04-12',
+    ministryRole: 'Diácono / Recepção',
+    isActive: true,
+    joinedDate: '2015-03-01',
+    notes: 'Dizimista fiel e participante ativo do conselho de diáconos.'
+  },
+  {
+    id: 'mbr-2',
+    sigiloCode: 'MBR-2024-015',
+    name: 'Claudia Helena Siqueira',
+    phone: '(11) 99222-3344',
+    email: 'claudia.siqueira@email.com',
+    address: 'Av. Paulista, 800 - Apto 42',
+    baptismDate: '2018-11-20',
+    ministryRole: 'Professora EBD Infantil',
+    isActive: true,
+    joinedDate: '2018-10-05',
+    notes: 'Coordenadora do departamento infantil e ofertante constante.'
+  },
+  {
+    id: 'mbr-3',
+    sigiloCode: 'MBR-2025-088',
+    name: 'Marcos Antonio de Oliveira',
+    phone: '(11) 97333-4455',
+    email: 'marcos.oliveira@email.com',
+    address: 'Rua São Bento, 90',
+    baptismDate: '2021-08-15',
+    ministryRole: 'Membro Ativo',
+    isActive: true,
+    joinedDate: '2021-07-10',
+    notes: 'Contribui preferencialmente via PIX nominal.'
+  },
+  {
+    id: 'mbr-4',
+    sigiloCode: 'MBR-2025-102',
+    name: 'Ana Paula Ferreira Lima',
+    phone: '(11) 96444-5566',
+    email: 'ana.lima@email.com',
+    address: 'Rua do Bosque, 320',
+    baptismDate: '2012-06-03',
+    ministryRole: 'Líder de Louvor',
+    isActive: true,
+    joinedDate: '2012-05-15',
+    notes: 'Vocalista principal do ministério de louvor.'
+  },
+  {
+    id: 'mbr-5',
+    sigiloCode: 'MBR-2026-140',
+    name: 'Família Souza (Doação Conjunta)',
+    phone: '(11) 95555-6677',
+    email: 'familia.souza@email.com',
+    address: 'Al. dos Anjos, 50',
+    baptismDate: '2023-12-10',
+    ministryRole: 'Membros',
+    isActive: true,
+    joinedDate: '2023-11-01',
+    notes: 'Contribuição com voto de fé e missões.'
+  }
+];
+
+export const INITIAL_TRANSACTIONS: FinancialTransaction[] = [
+  {
+    id: 'tx-1',
+    receiptNumber: 'REC-2026-0801',
+    type: 'entrada',
+    category: 'Dízimo',
+    amount: 1450.00,
+    date: '2026-08-05',
+    description: 'Devolução de Dízimo Sagrado - Mês Agosto',
+    paymentMethod: 'PIX',
+    memberId: 'mbr-1',
+    memberSigiloCode: 'MBR-2024-001',
+    memberNameCached: 'Sebastião Alves Moreira',
+    isStrictConfidential: true,
+    registeredBy: 'Tesoureiro Geral',
+    createdAt: '2026-08-05 10:15'
+  },
+  {
+    id: 'tx-2',
+    receiptNumber: 'REC-2026-0802',
+    type: 'entrada',
+    category: 'Dízimo',
+    amount: 820.00,
+    date: '2026-08-06',
+    description: 'Devolução de Dízimo Sagrado',
+    paymentMethod: 'Transferência Bancária',
+    memberId: 'mbr-2',
+    memberSigiloCode: 'MBR-2024-015',
+    memberNameCached: 'Claudia Helena Siqueira',
+    isStrictConfidential: true,
+    registeredBy: 'Tesoureiro Geral',
+    createdAt: '2026-08-06 14:40'
+  },
+  {
+    id: 'tx-3',
+    receiptNumber: 'REC-2026-0803',
+    type: 'entrada',
+    category: 'Oferta de Culto',
+    amount: 3240.50,
+    date: '2026-08-09',
+    description: 'Ofertas recolhidas no Culto da Família de Domingo (Gazofilácio e PIX da igreja)',
+    paymentMethod: 'Dinheiro',
+    isStrictConfidential: false,
+    registeredBy: 'Equipe de Tesouraria',
+    createdAt: '2026-08-09 21:10'
+  },
+  {
+    id: 'tx-4',
+    receiptNumber: 'REC-2026-0804',
+    type: 'entrada',
+    category: 'Dízimo',
+    amount: 2100.00,
+    date: '2026-08-10',
+    description: 'Dízimo Sigiloso Registrado via PIX',
+    paymentMethod: 'PIX',
+    memberId: 'mbr-3',
+    memberSigiloCode: 'MBR-2025-088',
+    memberNameCached: 'Marcos Antonio de Oliveira',
+    isStrictConfidential: true,
+    registeredBy: 'Tesoureiro Geral',
+    createdAt: '2026-08-10 09:30'
+  },
+  {
+    id: 'tx-5',
+    receiptNumber: 'REC-2026-0805',
+    type: 'entrada',
+    category: 'Oferta Missionária',
+    amount: 1580.00,
+    date: '2026-08-16',
+    description: 'Oferta especial de Missões recolhida no 3º Domingo do mês',
+    paymentMethod: 'PIX',
+    isStrictConfidential: false,
+    registeredBy: 'Secretaria de Missões',
+    createdAt: '2026-08-16 20:45'
+  },
+  {
+    id: 'tx-6',
+    receiptNumber: 'REC-2026-0806',
+    type: 'entrada',
+    category: 'Campanha / Construção',
+    amount: 5000.00,
+    date: '2026-08-18',
+    description: 'Oferta de voto para reforma do piso e isolamento acústico do templo',
+    paymentMethod: 'Transferência Bancária',
+    memberId: 'mbr-5',
+    memberSigiloCode: 'MBR-2026-140',
+    memberNameCached: 'Família Souza',
+    isStrictConfidential: true,
+    registeredBy: 'Tesoureiro Geral',
+    createdAt: '2026-08-18 11:20'
+  },
+  {
+    id: 'tx-7',
+    receiptNumber: 'DESP-2026-0801',
+    type: 'saida',
+    category: 'Contas de Consumo (Água/Luz/Net)',
+    amount: 1420.30,
+    date: '2026-08-10',
+    description: 'Pagamento conta de energia elétrica ENEL (Templo Sede e salas de aula)',
+    paymentMethod: 'Boleto',
+    isStrictConfidential: false,
+    registeredBy: 'Tesoureiro Geral',
+    createdAt: '2026-08-10 15:00'
+  },
+  {
+    id: 'tx-8',
+    receiptNumber: 'DESP-2026-0802',
+    type: 'saida',
+    category: 'Contas de Consumo (Água/Luz/Net)',
+    amount: 380.50,
+    date: '2026-08-12',
+    description: 'Pagamento SABESP Água e Esgoto referente a Julho/Agosto',
+    paymentMethod: 'Boleto',
+    isStrictConfidential: false,
+    registeredBy: 'Tesoureiro Geral',
+    createdAt: '2026-08-12 10:00'
+  },
+  {
+    id: 'tx-9',
+    receiptNumber: 'DESP-2026-0803',
+    type: 'saida',
+    category: 'Missões e Ação Social',
+    amount: 2500.00,
+    date: '2026-08-15',
+    description: 'Sustento missionário mensal para campos no Sertão Nordestino e Moçambique + Sopão Comunitário',
+    paymentMethod: 'PIX',
+    isStrictConfidential: false,
+    registeredBy: 'Tesoureiro Geral',
+    createdAt: '2026-08-15 09:00'
+  },
+  {
+    id: 'tx-10',
+    receiptNumber: 'DESP-2026-0804',
+    type: 'saida',
+    category: 'Manutenção e Conservação',
+    amount: 890.00,
+    date: '2026-08-17',
+    description: 'Conserto e higienização dos aparelhos de ar-condicionado do santuário',
+    paymentMethod: 'PIX',
+    isStrictConfidential: false,
+    registeredBy: 'Tesoureiro Geral',
+    createdAt: '2026-08-17 16:30'
+  },
+  {
+    id: 'tx-11',
+    receiptNumber: 'DESP-2026-0805',
+    type: 'saida',
+    category: 'Material Eclesiástico / Ceia',
+    amount: 450.00,
+    date: '2026-08-01',
+    description: 'Compra de cálices descartáveis, pães para Ceia e materiais de EBD infantil',
+    paymentMethod: 'Cartão',
+    isStrictConfidential: false,
+    registeredBy: 'Secretaria',
+    createdAt: '2026-08-01 11:15'
+  }
+];
+
+export const DAILY_VERSES = [
+  {
+    verse: 'Porque sou Eu que conheço os planos que tenho para vocês, diz o Senhor, planos de fazê-los prosperar e não de lhes causar dano, planos de dar-lhes esperança e um futuro.',
+    reference: 'Jeremias 29:11'
+  },
+  {
+    verse: 'Trazei todos os dízimos à casa do tesouro, para que haja mantimento na minha casa, e depois fazei prova de mim, diz o Senhor dos Exércitos, se eu não vos abrir as janelas do céu.',
+    reference: 'Malaquias 3:10'
+  },
+  {
+    verse: 'Cada um dê conforme determinou em seu coração, não com pesar ou por obrigação, pois Deus ama quem dá com alegria.',
+    reference: '2 Coríntios 9:7'
+  },
+  {
+    verse: 'Alegrei-me quando me disseram: Vamos à casa do Senhor!',
+    reference: 'Salmos 122:1'
+  },
+  {
+    verse: 'Buscai primeiro o Reino de Deus e a sua justiça, e todas estas coisas vos serão acrescentadas.',
+    reference: 'Mateus 6:33'
+  }
+];
+
+export const INITIAL_SYSTEM_USERS: SystemUser[] = [
+  {
+    id: 'usr-1',
+    name: 'Pr. Carlos Eduardo',
+    username: 'pastor',
+    password: '1234', // default demo PIN / password
+    role: 'pastor',
+    email: 'pastor.carlos@obrasilparacristo.org.br',
+    phone: '(11) 99876-5432',
+    isActive: true,
+    createdAt: '2026-01-10',
+    lastLogin: '2026-08-24 15:30',
+    createdBy: 'Sistema'
+  },
+  {
+    id: 'usr-2',
+    name: 'Tesoureiro Geral',
+    username: 'tesouraria',
+    password: '1234',
+    role: 'tesoureiro',
+    email: 'tesouraria@obrasilparacristo.org.br',
+    phone: '(11) 98765-4321',
+    isActive: true,
+    createdAt: '2026-01-15',
+    lastLogin: '2026-08-24 14:10',
+    createdBy: 'Pr. Carlos Eduardo'
+  },
+  {
+    id: 'usr-3',
+    name: 'Secretaria Eclesiástica & Mídia',
+    username: 'secretaria',
+    password: '1234',
+    role: 'secretaria',
+    email: 'secretaria@obrasilparacristo.org.br',
+    phone: '(11) 3214-8800',
+    isActive: true,
+    createdAt: '2026-02-01',
+    lastLogin: '2026-08-23 18:45',
+    createdBy: 'Pr. Carlos Eduardo'
+  },
+  {
+    id: 'usr-4',
+    name: 'Liderança de Ministério (ADOBRAC / UFEBRAC)',
+    username: 'lideranca',
+    password: '1234',
+    role: 'lider',
+    email: 'lideranca@obrasilparacristo.org.br',
+    phone: '(11) 97654-3210',
+    isActive: true,
+    createdAt: '2026-03-01',
+    lastLogin: '2026-08-20 19:15',
+    createdBy: 'Pr. Carlos Eduardo'
+  }
+];
+
+export const INITIAL_AUDIT_LOGS: AuditLog[] = [
+  {
+    id: 'log-1',
+    timestamp: '24/08/2026 15:30:12',
+    userName: 'Pr. Carlos Eduardo',
+    userRole: 'pastor',
+    action: 'Login no Sistema',
+    category: 'AUTH',
+    details: 'Acesso autenticado ao Painel Pastoral e Administrativo.',
+    ipAddress: '189.40.122.15',
+    status: 'sucesso'
+  },
+  {
+    id: 'log-2',
+    timestamp: '24/08/2026 14:22:45',
+    userName: 'Tesoureiro Geral',
+    userRole: 'tesoureiro',
+    action: 'Lançamento de Dízimo',
+    category: 'FINANCEIRO',
+    details: 'Registrado dízimo de R$ 750,00 para o membro MBR-2026-102 (Recibo REC-2026-3021).',
+    ipAddress: '177.38.90.44',
+    status: 'sucesso'
+  },
+  {
+    id: 'log-3',
+    timestamp: '24/08/2026 11:15:30',
+    userName: 'Secretaria & Mídia',
+    userRole: 'secretaria',
+    action: 'Atualização de Horários de Cultos',
+    category: 'CULTOS',
+    details: 'Atualizada a programação do Círculo de Oração Forene de Segunda-feira.',
+    ipAddress: '189.40.122.15',
+    status: 'sucesso'
+  },
+  {
+    id: 'log-4',
+    timestamp: '23/08/2026 20:45:10',
+    userName: 'Pr. Carlos Eduardo',
+    userRole: 'pastor',
+    action: 'Atendimento de Pedido de Oração',
+    category: 'ORACAO',
+    details: 'Status do pedido de oração de Maria Aparecida alterado para "Em Oração".',
+    ipAddress: '189.40.122.15',
+    status: 'sucesso'
+  },
+  {
+    id: 'log-5',
+    timestamp: '23/08/2026 16:30:00',
+    userName: 'Secretaria & Mídia',
+    userRole: 'secretaria',
+    action: 'Novo Evento Publicado',
+    category: 'EVENTOS',
+    details: 'Publicado evento "Vigília das 12 Horas de Clamor" para 20/09/2026.',
+    ipAddress: '177.38.90.44',
+    status: 'sucesso'
+  }
+];
+

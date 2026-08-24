@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 240" width="540" height="240">
+  <defs>
+    <!-- Green gradient for Brazil flag wing -->
+    <linearGradient id="obpcGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#008837"/>
+      <stop offset="100%" stop-color="#006324"/>
+    </linearGradient>
+
+    <!-- Yellow gradient for border curves -->
+    <linearGradient id="obpcYellow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffeb3b"/>
+      <stop offset="100%" stop-color="#fbc02d"/>
+    </linearGradient>
+
+    <!-- Blue gradient for celestial sphere -->
+    <linearGradient id="obpcBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#005bac"/>
+      <stop offset="100%" stop-color="#002b66"/>
+    </linearGradient>
+  </defs>
+
+  <!-- === 1. EMBLEM SYMBOL === -->
+  <g transform="translate(10, 10)">
+    <!-- Main Green Wing with stylized curves and yellow borders -->
+    <!-- Top yellow arc trim -->
+    <path d="M 68 108 C 88 108, 120 95, 175 88 C 218 82, 235 90, 245 92 C 205 105, 170 125, 150 148 C 110 128, 85 116, 68 108 Z" fill="url(#obpcYellow)" stroke="#ffffff" stroke-width="1.5"/>
+
+    <!-- Main Green Body -->
+    <path d="M 12 172 C 30 152, 55 130, 68 108 C 65 125, 80 138, 98 140 C 65 146, 38 160, 12 172 Z" fill="url(#obpcGreen)" stroke="url(#obpcYellow)" stroke-width="1.5"/>
+    <path d="M 12 172 C 45 160, 95 140, 150 148 C 175 152, 195 158, 210 160 C 160 165, 105 178, 12 172 Z" fill="url(#obpcGreen)"/>
+    <path d="M 68 108 C 95 110, 140 100, 195 90 C 165 115, 145 138, 135 152 C 105 148, 80 135, 68 108 Z" fill="url(#obpcGreen)"/>
+    
+    <!-- Outer Yellow Outline Border contour -->
+    <path d="M 12 172 C 32 148, 62 118, 68 108 C 98 105, 160 88, 248 92 C 205 105, 168 130, 148 152 C 180 155, 202 158, 212 160 C 145 168, 80 178, 12 172 Z" fill="none" stroke="url(#obpcYellow)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+
+    <!-- Bottom Yellow Accent Curve -->
+    <path d="M 98 140 C 135 150, 175 154, 212 160 C 158 166, 110 174, 18 174" fill="none" stroke="url(#obpcYellow)" stroke-width="2.5" stroke-linecap="round"/>
+
+    <!-- Blue Celestial Globe -->
+    <g transform="translate(162, 106)">
+      <!-- Sliced blue sphere -->
+      <path d="M 2 30 C 0 10, 18 -6, 42 -6 C 58 -6, 68 2, 70 8 C 58 24, 48 38, 42 50 C 22 48, 6 42, 2 30 Z" fill="url(#obpcBlue)" stroke="#ffffff" stroke-width="1.5"/>
+      <!-- Globe white stripe / celestial curve -->
+      <path d="M 0 32 C 14 18, 30 6, 52 0 C 50 6, 46 14, 42 22 C 26 26, 12 30, 0 32 Z" fill="#ffffff" opacity="0.95"/>
+    </g>
+  </g>
+
+  <!-- === 2. OFFICIAL TYPOGRAPHY === -->
+  <g fill="#111827">
+    <!-- "Igreja" -->
+    <text x="258" y="104" font-family="'Inter', 'Montserrat', Arial, sans-serif" font-weight="700" font-size="25" letter-spacing="-0.5">Igreja</text>
+
+    <!-- "O Brasil" with custom O ring -->
+    <g transform="translate(258, 132)">
+      <!-- Large stylistic "O" ring -->
+      <circle cx="21" cy="-7" r="18" fill="none" stroke="#111827" stroke-width="6.5"/>
+      <!-- "Brasil" -->
+      <text x="48" y="0" font-family="'Inter', 'Montserrat', Arial, sans-serif" font-weight="600" font-size="34" letter-spacing="-0.5">Brasil</text>
+    </g>
+
+    <!-- "para" & "CRISTO" -->
+    <text x="228" y="162" font-family="'Inter', 'Montserrat', Arial, sans-serif" font-weight="800" font-size="20" letter-spacing="-0.5">para</text>
+    <text x="280" y="166" font-family="'Inter', 'Arial Black', sans-serif" font-weight="900" font-size="36" letter-spacing="1">CRISTO</text>
+
+    <!-- Underline bar -->
+    <line x1="230" y1="174" x2="520" y2="174" stroke="#111827" stroke-width="1.5"/>
+  </g>
+</svg>

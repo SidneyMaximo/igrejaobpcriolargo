@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+
+  body {
+    background-color: #f8fafc;
+    color: #1e293b;
+    overflow-x: hidden;
+  }
+}
+
+.font-script {
+  font-family: 'Great Vibes', 'Brush Script MT', cursive;
+}
+
+.font-serif-title {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.font-display {
+  font-family: 'Montserrat', 'Inter', system-ui, sans-serif;
+}
+
+/* Template Theme Colors & Helpers */
+.text-template-green {
+  color: #70b83b;
+}
+
+.bg-template-green {
+  background-color: #70b83b;
+}
+
+.hover\:bg-template-green-dark:hover {
+  background-color: #61a332;
+}
+
+.bg-template-orange {
+  background-color: #ff5a1f;
+}
+
+.hover\:bg-template-orange-dark:hover {
+  background-color: #e44a12;
+}
+
+.bg-template-yellow {
+  background-color: #fbc02d;
+}
+
+.hover\:bg-template-yellow-dark:hover {
+  background-color: #f57f17;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #70b83b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff5a1f;
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  
+  header, nav, footer, button, .no-print {
+    display: none !important;
+  }
+
+  #printable-receipt-card, #assembly-report-printable {
+    box-shadow: none !important;
+    border: 1px solid #000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+}
+
