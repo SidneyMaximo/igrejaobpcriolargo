@@ -151,12 +151,21 @@ const STORAGE_KEYS = {
   LOGS: 'obpc_audit_logs_v1'
 };
 
+const safeParse = <T,>(key: string, fallback: T): T => {
+  try {
+    const saved = localStorage.getItem(key);
+    return saved ? JSON.parse(saved) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+};
+
 export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // 1. Church Info
   const [churchInfo, setChurchInfo] = useState<ChurchInfo>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.INFO);
-    if (saved) {
-      try {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.INFO);
+      if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed.pixKey === '45.123.890/0001-55' || parsed.pixKey === '00.123.456/0001-99' || !parsed.pixKey) {
           parsed.pixKey = '82999694402';
@@ -172,76 +181,42 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           parsed.liveStreamUrl = 'https://youtube.com/@obpcriolargo/live';
         }
         return parsed;
-      } catch (e) {
-        return INITIAL_CHURCH_INFO;
       }
+    } catch (e) {
+      console.warn('Erro ao carregar churchInfo do localStorage, usando padrão:', e);
     }
     return INITIAL_CHURCH_INFO;
   });
 
   // 2. Schedules
-  const [schedules, setSchedules] = useState<WeeklySchedule[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.SCHEDULES);
-    return saved ? JSON.parse(saved) : INITIAL_SCHEDULES;
-  });
+  const [schedules, setSchedules] = useState<WeeklySchedule[]>(() => safeParse(STORAGE_KEYS.SCHEDULES, INITIAL_SCHEDULES));
 
   // 3. Events
-  const [events, setEvents] = useState<ChurchEvent[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.EVENTS);
-    return saved ? JSON.parse(saved) : INITIAL_EVENTS;
-  });
+  const [events, setEvents] = useState<ChurchEvent[]>(() => safeParse(STORAGE_KEYS.EVENTS, INITIAL_EVENTS));
 
   // 4. Media Folders & Items
-  const [mediaFolders, setMediaFolders] = useState<MediaFolder[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.FOLDERS);
-    return saved ? JSON.parse(saved) : INITIAL_MEDIA_FOLDERS;
-  });
-
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.MEDIA);
-    return saved ? JSON.parse(saved) : INITIAL_MEDIA_ITEMS;
-  });
+  const [mediaFolders, setMediaFolders] = useState<MediaFolder[]>(() => safeParse(STORAGE_KEYS.FOLDERS, INITIAL_MEDIA_FOLDERS));
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>(() => safeParse(STORAGE_KEYS.MEDIA, INITIAL_MEDIA_ITEMS));
 
   // 5. Prayer Requests
-  const [prayerRequests, setPrayerRequests] = useState<PrayerRequest[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.PRAYERS);
-    return saved ? JSON.parse(saved) : INITIAL_PRAYER_REQUESTS;
-  });
+  const [prayerRequests, setPrayerRequests] = useState<PrayerRequest[]>(() => safeParse(STORAGE_KEYS.PRAYERS, INITIAL_PRAYER_REQUESTS));
 
   // 6. Members (CRM)
-  const [members, setMembers] = useState<ChurchMember[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.MEMBERS);
-    return saved ? JSON.parse(saved) : INITIAL_MEMBERS;
-  });
+  const [members, setMembers] = useState<ChurchMember[]>(() => safeParse(STORAGE_KEYS.MEMBERS, INITIAL_MEMBERS));
 
   // 7. Transactions (CRM)
-  const [transactions, setTransactions] = useState<FinancialTransaction[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.TRANSACTIONS);
-    return saved ? JSON.parse(saved) : INITIAL_TRANSACTIONS;
-  });
+  const [transactions, setTransactions] = useState<FinancialTransaction[]>(() => safeParse(STORAGE_KEYS.TRANSACTIONS, INITIAL_TRANSACTIONS));
 
   // 8. System Users
-  const [users, setUsers] = useState<SystemUser[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.USERS);
-    return saved ? JSON.parse(saved) : INITIAL_SYSTEM_USERS;
-  });
+  const [users, setUsers] = useState<SystemUser[]>(() => safeParse(STORAGE_KEYS.USERS, INITIAL_SYSTEM_USERS));
 
   // 9. Audit Logs
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.LOGS);
-    return saved ? JSON.parse(saved) : INITIAL_AUDIT_LOGS;
-  });
+  const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => safeParse(STORAGE_KEYS.LOGS, INITIAL_AUDIT_LOGS));
 
   // 10. Admin Session & Privacy
-  const [adminSession, setAdminSession] = useState<AdminSession | null>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.ADMIN);
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [adminSession, setAdminSession] = useState<AdminSession | null>(() => safeParse(STORAGE_KEYS.ADMIN, null));
 
-  const [isSigiloModeActive, setIsSigiloModeActive] = useState<boolean>(() => {
-    const saved = localStorage.getItem(STORAGE_KEYS.SIGILO);
-    return saved !== null ? JSON.parse(saved) : true;
-  });
+  const [isSigiloModeActive, setIsSigiloModeActive] = useState<boolean>(() => safeParse(STORAGE_KEYS.SIGILO, true));
 
   // Supabase State
   const [supabaseStatus, setSupabaseStatus] = useState<SupabaseStatus>('checking');
