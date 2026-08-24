@@ -17,7 +17,7 @@ jobs:
       - name: ⚙️ Setup do Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
 
       - name: 📦 Instalar Dependências
@@ -30,11 +30,9 @@ jobs:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       - name: 🚀 Sincronizar via FTP para Hostinger (public_html)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER || secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME || secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD || secrets.FTP_PASS }}
-          local-dir: ./dist/
-          server-dir: ./public_html/
-          dangerous-clean-slate: false
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER || secrets.FTP_HOST || vars.FTP_SERVER || vars.FTP_HOST }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME || secrets.FTP_USER || vars.FTP_USERNAME || vars.FTP_USER }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD || secrets.FTP_PASS || vars.FTP_PASSWORD || vars.FTP_PASS }}
+          FTP_REMOTE_DIR: 'public_html'
+        run: node deploy-ftp.js
