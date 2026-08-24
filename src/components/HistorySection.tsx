@@ -268,12 +268,11 @@ export const HistorySection: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               
               <div className="lg:col-span-5 space-y-3 text-center sm:text-left">
-                <div className="relative mx-auto sm:mx-0 w-40 h-40 sm:w-48 sm:h-48 rounded-2xl overflow-hidden border border-slate-300 shadow-md">
+                <div className="relative mx-auto sm:mx-0 w-40 h-40 sm:w-48 sm:h-48 rounded-2xl overflow-hidden border-2 border-[#70b83b]/40 shadow-lg">
                   <img
-                    src="https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80"
-                    alt="Memórias Históricas OBPC"
-                    className="w-full h-full object-cover filter grayscale contrast-125"
-                    referrerPolicy="no-referrer"
+                    src="/pastor-manoel-de-mello.jpg"
+                    alt="Missionário Manoel de Mello"
+                    className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-300"
                   />
                 </div>
 

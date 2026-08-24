@@ -46,12 +46,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const navLinks = [
     { id: 'inicio', label: 'INÍCIO' },
-    { id: 'missao', label: 'NOSSA MISSÃO' },
-    { id: 'causas', label: 'NOSSAS CAUSAS' },
     { id: 'historia', label: 'SOBRE NÓS' },
     { id: 'cultos', label: 'CULTOS & HORÁRIOS' },
-    { id: 'transparencia', label: 'TRANSPARÊNCIA' },
-    { id: 'estudos', label: 'NOTÍCIAS & BLOG' },
+    { id: 'eventos', label: 'EVENTOS' },
+    { id: 'midia', label: 'GALERIA' },
+    { id: 'oracao', label: 'ORAÇÃO' },
     { id: 'contribuir', label: 'DÍZIMOS (PIX)' },
     { id: 'contato', label: 'CONTATO' }
   ];
@@ -81,7 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     } else if (query.includes('foto') || query.includes('video') || query.includes('midia')) {
       handleLinkClick('midia');
     } else {
-      handleLinkClick('causas');
+      handleLinkClick('historia');
     }
     setSearchOpen(false);
     setSearchQuery('');

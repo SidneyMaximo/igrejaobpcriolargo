@@ -119,21 +119,21 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onNavigate }) => {
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
               <button
                 id="hero-how-help-btn"
-                onClick={() => onNavigate('causas')}
+                onClick={() => onNavigate('cultos')}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#ff5a1f] hover:bg-[#e44a12] text-white font-bold text-base px-8 py-4 rounded-xl shadow-lg transition-all hover:scale-105 active:scale-95 group"
               >
-                <span>Como Você Pode Participar?</span>
+                <span>Conheça Nossos Cultos</span>
                 <div className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center transition-transform group-hover:translate-x-1">
                   <ArrowRight className="w-4 h-4 text-white" />
                 </div>
               </button>
 
               <button
-                onClick={() => onNavigate('cultos')}
+                onClick={() => onNavigate('eventos')}
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-slate-900/80 hover:bg-slate-800 backdrop-blur-sm text-slate-100 font-bold text-sm px-6 py-4 rounded-xl border border-blue-400/30 transition-all shadow"
               >
                 <Clock className="w-4 h-4 text-amber-400" />
-                <span>Horários dos Cultos</span>
+                <span>Próximos Eventos</span>
               </button>
             </div>
 
