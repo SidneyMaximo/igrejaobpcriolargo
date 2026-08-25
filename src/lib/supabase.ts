@@ -43,16 +43,15 @@ export const sanitizeKey = (raw: string | null | undefined): string => {
 };
 
 export const getSupabaseCredentials = (): { url: string; key: string; isCustom: boolean } => {
-  const env = (import.meta as any).env || {};
-  
-  // Limpar qualquer override corrompido antigo do localStorage
+  // Prioridade absoluta: variáveis de ambiente injetadas no build pelo Vite / import.meta.env
+  const envUrl = sanitizeUrl(import.meta.env.VITE_SUPABASE_URL) || DEFAULT_SUPABASE_URL;
+  const envKey = sanitizeKey(import.meta.env.VITE_SUPABASE_ANON_KEY) || DEFAULT_SUPABASE_ANON_KEY;
+
+  // Limpeza garantida de chaves legadas de contingência do localStorage
   try {
     localStorage.removeItem(STORAGE_SUPABASE_URL);
     localStorage.removeItem(STORAGE_SUPABASE_KEY);
   } catch (e) {}
-
-  const envUrl = sanitizeUrl(env.VITE_SUPABASE_URL || env.SUPABASE_URL) || DEFAULT_SUPABASE_URL;
-  const envKey = sanitizeKey(env.VITE_SUPABASE_ANON_KEY || env.SUPABASE_PUBLISHABLE_KEY) || DEFAULT_SUPABASE_ANON_KEY;
 
   return {
     url: envUrl,
