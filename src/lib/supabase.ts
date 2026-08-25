@@ -44,23 +44,12 @@ export const sanitizeKey = (raw: string | null | undefined): string => {
 
 export const getSupabaseCredentials = (): { url: string; key: string; isCustom: boolean } => {
   const env = (import.meta as any).env || {};
-  let customUrl = sanitizeUrl(localStorage.getItem(STORAGE_SUPABASE_URL));
-  let customKey = sanitizeKey(localStorage.getItem(STORAGE_SUPABASE_KEY));
-
-  // Limpeza automática se o localStorage estiver corrompido com sintaxe de markdown
-  const rawStoredUrl = localStorage.getItem(STORAGE_SUPABASE_URL);
-  if (rawStoredUrl && rawStoredUrl !== customUrl) {
-    if (customUrl && customUrl.startsWith('http')) {
-      localStorage.setItem(STORAGE_SUPABASE_URL, customUrl);
-    } else {
-      localStorage.removeItem(STORAGE_SUPABASE_URL);
-      customUrl = '';
-    }
-  }
-
-  if (customUrl && customKey && customUrl.startsWith('http')) {
-    return { url: customUrl, key: customKey, isCustom: true };
-  }
+  
+  // Limpar qualquer override corrompido antigo do localStorage
+  try {
+    localStorage.removeItem(STORAGE_SUPABASE_URL);
+    localStorage.removeItem(STORAGE_SUPABASE_KEY);
+  } catch (e) {}
 
   const envUrl = sanitizeUrl(env.VITE_SUPABASE_URL || env.SUPABASE_URL) || DEFAULT_SUPABASE_URL;
   const envKey = sanitizeKey(env.VITE_SUPABASE_ANON_KEY || env.SUPABASE_PUBLISHABLE_KEY) || DEFAULT_SUPABASE_ANON_KEY;

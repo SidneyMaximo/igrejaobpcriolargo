@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Database, 
   Check, 
@@ -6,29 +6,13 @@ import {
   Download, 
   RefreshCw, 
   AlertCircle, 
-  Terminal, 
   UploadCloud, 
   DownloadCloud, 
   CheckCircle2,
   Building2,
-  Plus,
-  Users,
-  Layers,
-  Sparkles,
-  Edit3,
-  Key,
-  Link,
-  ShieldCheck,
-  Eye,
-  EyeOff,
-  RotateCcw
+  ShieldCheck
 } from 'lucide-react';
-import { 
-  SUPABASE_SCHEMA_SQL, 
-  getSupabaseCredentials, 
-  DEFAULT_SUPABASE_URL, 
-  DEFAULT_SUPABASE_ANON_KEY 
-} from '../../lib/supabase';
+import { SUPABASE_SCHEMA_SQL } from '../../lib/supabase';
 import { useChurch } from '../../context/ChurchContext';
 
 export const AdminSupabaseSettings: React.FC = () => {
@@ -50,28 +34,20 @@ export const AdminSupabaseSettings: React.FC = () => {
     isSyncing,
     syncToSupabase,
     syncFromSupabase,
-    checkSupabaseHealth,
-    saveCredentials,
-    clearCredentials
+    checkSupabaseHealth
   } = useChurch();
 
   const [copied, setCopied] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [testingConnection, setTestingConnection] = useState(false);
-  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
-  // Auto-clean any legacy corrupted credentials on mount
+  // Auto-clean any legacy corrupted credentials on mount and verify health
   useEffect(() => {
-    const rawUrl = localStorage.getItem('obpc_supabase_url_v1');
-    if (rawUrl && (!rawUrl.startsWith('http') || rawUrl.includes('[') || rawUrl.includes(']'))) {
+    try {
       localStorage.removeItem('obpc_supabase_url_v1');
       localStorage.removeItem('obpc_supabase_anon_key_v1');
-      const creds = getSupabaseCredentials();
-      setSupabaseUrlInput(creds.url);
-      setSupabaseKeyInput(creds.key);
-      setIsCustomCreds(false);
-      checkSupabaseHealth();
-    }
+    } catch (e) {}
+    checkSupabaseHealth();
   }, [checkSupabaseHealth]);
 
   // Church info form
@@ -100,42 +76,6 @@ export const AdminSupabaseSettings: React.FC = () => {
     navigator.clipboard.writeText(SUPABASE_SCHEMA_SQL);
     setCopied(true);
     setTimeout(() => setCopied(false), 3000);
-  };
-
-  const handleSaveCredentials = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!supabaseUrlInput.trim() || !supabaseKeyInput.trim()) {
-      setFeedbackMsg({ type: 'error', text: 'Preencha a URL do projeto e a Anon Key do Supabase.' });
-      return;
-    }
-
-    setSavingCreds(true);
-    const res = await saveCredentials(supabaseUrlInput.trim(), supabaseKeyInput.trim());
-    setSavingCreds(false);
-
-    if (res.success) {
-      setIsCustomCreds(true);
-      setFeedbackMsg({ type: 'success', text: 'Credenciais do Supabase salvas e conectadas com sucesso!' });
-    } else {
-      setFeedbackMsg({ type: 'error', text: res.message });
-    }
-  };
-
-  const handleRestoreDefaultCreds = async () => {
-    clearCredentials();
-    setSupabaseUrlInput(DEFAULT_SUPABASE_URL);
-    setSupabaseKeyInput(DEFAULT_SUPABASE_ANON_KEY);
-    setIsCustomCreds(false);
-    
-    setTestingConnection(true);
-    const res = await checkSupabaseHealth();
-    setTestingConnection(false);
-
-    if (res.success) {
-      setFeedbackMsg({ type: 'success', text: 'Restaurado para as credenciais padrão do sistema (.env) e conectado!' });
-    } else {
-      setFeedbackMsg({ type: 'info', text: 'Restaurado para padrão do sistema. ' + res.message });
-    }
   };
 
   const handleTestConnection = async () => {
@@ -336,13 +276,13 @@ export const AdminSupabaseSettings: React.FC = () => {
               </div>
               <div>
                 <h5 className="text-sm font-bold text-white flex items-center gap-2">
-                  <span>Conexão Segura em Nuvem (PostgreSQL)</span>
+                  <span>Banco de Dados em Nuvem (PostgreSQL)</span>
                   <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    SSL / TLS 256-bit
+                    Criptografia SSL/TLS Ativa
                   </span>
                 </h5>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Banco de dados em nuvem centralizado para armazenamento em tempo real de cultos, membros, eventos e financeiro.
+                  Armazenamento seguro e criptografado em nuvem para cultos, membros, eventos, mídias e financeiro.
                 </p>
               </div>
             </div>
@@ -350,13 +290,12 @@ export const AdminSupabaseSettings: React.FC = () => {
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={handleRestoreDefaultCreds}
-                disabled={testingConnection}
-                className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs px-3 py-1.5 rounded-xl border border-slate-700 transition-all shadow disabled:opacity-50"
-                title="Garante a reconexão automática com as credenciais oficiais do sistema"
+                onClick={handleCopySql}
+                className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs px-3.5 py-2 rounded-xl border border-slate-700 transition-all shadow"
+                title="Copiar script SQL para criação das 12 tabelas"
               >
-                <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
-                <span>Reconectar Servidor Oficial</span>
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-amber-400" />}
+                <span>{copied ? 'Script Copiado!' : 'Copiar Script SQL'}</span>
               </button>
             </div>
           </div>
@@ -364,8 +303,9 @@ export const AdminSupabaseSettings: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-800/80 text-xs">
             <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
               <span className="text-[11px] text-slate-400 block mb-0.5">Servidor em Nuvem:</span>
-              <span className="font-mono text-slate-200 font-semibold truncate block">
-                pgbmlczhzihihzbxmias.supabase.co
+              <span className="text-slate-200 font-semibold truncate block flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Supabase PostgreSQL 15 (Protegido)</span>
               </span>
             </div>
             <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
@@ -375,7 +315,7 @@ export const AdminSupabaseSettings: React.FC = () => {
               </span>
             </div>
             <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-              <span className="text-[11px] text-slate-400 block mb-0.5">Protocolo em Tempo Real:</span>
+              <span className="text-[11px] text-slate-400 block mb-0.5">Sincronização em Tempo Real:</span>
               <span className="text-sky-400 font-semibold block">
                 WebSockets &amp; Postgres WAL
               </span>
@@ -760,106 +700,6 @@ export const AdminSupabaseSettings: React.FC = () => {
             </div>
           ))}
         </div>
-      </div>
-
-      {/* Advanced Developer Settings (Collapsed by Default for Safety) */}
-      <div className="border border-slate-800/80 rounded-2xl overflow-hidden bg-slate-950/40">
-        <button
-          type="button"
-          onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
-          className="w-full px-5 py-3.5 flex items-center justify-between text-xs font-semibold text-slate-400 hover:text-white transition-colors"
-        >
-          <span className="flex items-center gap-2">
-            <Terminal className="w-4 h-4 text-amber-400" />
-            <span>Configurações Avançadas de Desenvolvedor &amp; Script SQL (Restrito)</span>
-          </span>
-          <span className="text-[11px] text-slate-500 font-mono">
-            {showAdvancedSettings ? '▲ Ocultar' : '▼ Expandir'}
-          </span>
-        </button>
-
-        {showAdvancedSettings && (
-          <div className="p-5 border-t border-slate-800/80 space-y-4 bg-slate-900/50">
-            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-xs text-amber-300 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-              <span>
-                <strong>Atenção:</strong> As credenciais oficiais do Supabase já estão integradas ao sistema. Só altere os valores abaixo se você for o administrador do banco de dados e quiser apontar para outro projeto Supabase.
-              </span>
-            </div>
-
-            <form onSubmit={handleSaveCredentials} className="space-y-4 pt-2">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    URL do Projeto Supabase
-                  </label>
-                  <input
-                    type="url"
-                    required
-                    value={supabaseUrlInput}
-                    onChange={(e) => setSupabaseUrlInput(e.target.value)}
-                    placeholder="https://exemplo.supabase.co"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-400 font-mono"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
-                    <span>Anon / Publishable Key</span>
-                    <button
-                      type="button"
-                      onClick={() => setShowKey(!showKey)}
-                      className="text-[10px] text-slate-400 hover:text-white inline-flex items-center gap-1"
-                    >
-                      {showKey ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                      <span>{showKey ? 'Ocultar' : 'Exibir'}</span>
-                    </button>
-                  </label>
-                  <input
-                    type={showKey ? 'text' : 'password'}
-                    required
-                    value={supabaseKeyInput}
-                    onChange={(e) => setSupabaseKeyInput(e.target.value)}
-                    placeholder="sb_publishable_... ou eyJhbGciOi..."
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-400 font-mono"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="submit"
-                    disabled={savingCreds}
-                    className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow disabled:opacity-50"
-                  >
-                    {savingCreds ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <ShieldCheck className="w-3.5 h-3.5" />}
-                    <span>Salvar Credenciais Customizadas</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleRestoreDefaultCreds}
-                    disabled={savingCreds || testingConnection}
-                    className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs px-3.5 py-2 rounded-xl border border-slate-700 transition-all shadow disabled:opacity-50"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Restaurar Padrão do Sistema</span>
-                  </button>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleCopySql}
-                  className="inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 font-semibold transition-colors"
-                >
-                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? 'Script SQL Copiado!' : 'Copiar Script SQL das 12 Tabelas'}</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
       </div>
 
     </div>
