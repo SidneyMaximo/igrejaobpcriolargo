@@ -15,7 +15,7 @@ import { useChurch } from '../../context/ChurchContext';
 import { WeeklySchedule } from '../../types';
 
 export const AdminSchedules: React.FC = () => {
-  const { schedules, addSchedule, updateSchedule, deleteSchedule } = useChurch();
+  const { schedules, addSchedule, updateSchedule, deleteSchedule, departments } = useChurch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSchedule, setEditingSchedule] = useState<WeeklySchedule | null>(null);
 
@@ -222,14 +222,23 @@ export const AdminSchedules: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Ministério / Grupo</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">Ministério / Departamento</label>
                   <input
                     type="text"
+                    list="departments-list"
                     value={ministry}
                     onChange={(e) => setMinistry(e.target.value)}
-                    placeholder="Ex: UFEBRAC, Jovens, Geral"
+                    placeholder="Ex: JUBRAC, UFEBRAC, Geral"
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400"
                   />
+                  <datalist id="departments-list">
+                    {departments.map((d) => (
+                      <option key={d.id} value={d.name} />
+                    ))}
+                    <option value="Ministério Geral" />
+                    <option value="Ministério de Ensino & Doutrina" />
+                    <option value="Ministério de Louvor" />
+                  </datalist>
                 </div>
 
                 <div>

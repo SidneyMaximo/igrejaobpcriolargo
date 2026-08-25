@@ -13,7 +13,8 @@ import {
   RoleType,
   SystemUser,
   AuditLog,
-  LogActionCategory
+  LogActionCategory,
+  ChurchDepartment
 } from '../types';
 import {
   INITIAL_CHURCH_INFO,
@@ -25,7 +26,8 @@ import {
   INITIAL_MEMBERS,
   INITIAL_TRANSACTIONS,
   INITIAL_SYSTEM_USERS,
-  INITIAL_AUDIT_LOGS
+  INITIAL_AUDIT_LOGS,
+  INITIAL_DEPARTMENTS
 } from '../data/seedData';
 import {
   isSupabaseConfigured,
@@ -67,6 +69,13 @@ interface ChurchContextType {
   updateEvent: (id: string, event: Partial<ChurchEvent>) => void;
   deleteEvent: (id: string) => void;
   registerEvent: (registration: Omit<EventRegistration, 'id' | 'registeredAt'>) => Promise<{ success: boolean; message: string }>;
+
+  // Departments / Ministérios (Acesso para todos os usuários)
+  departments: ChurchDepartment[];
+  addDepartment: (dept: Omit<ChurchDepartment, 'id' | 'createdAt'>) => { success: boolean; message: string; department?: ChurchDepartment };
+  updateDepartment: (id: string, dept: Partial<ChurchDepartment>) => { success: boolean; message: string };
+  deleteDepartment: (id: string) => { success: boolean; message: string };
+  toggleDepartmentStatus: (id: string) => void;
 
   // Media Folders & Items
   mediaFolders: MediaFolder[];
@@ -142,6 +151,7 @@ const STORAGE_KEYS = {
   INFO: 'obpc_church_info_v2',
   SCHEDULES: 'obpc_schedules_v2',
   EVENTS: 'obpc_events_v1',
+  DEPARTMENTS: 'obpc_departments_v1',
   FOLDERS: 'obpc_media_folders_v1',
   MEDIA: 'obpc_media_items_v1',
   PRAYERS: 'obpc_prayers_v1',
@@ -208,6 +218,9 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // 3. Events
   const [events, setEvents] = useState<ChurchEvent[]>(() => safeParse(STORAGE_KEYS.EVENTS, INITIAL_EVENTS));
 
+  // 3.1 Departments & Ministérios
+  const [departments, setDepartments] = useState<ChurchDepartment[]>(() => safeParse(STORAGE_KEYS.DEPARTMENTS, INITIAL_DEPARTMENTS));
+
   // 4. Media Folders & Items
   const [mediaFolders, setMediaFolders] = useState<MediaFolder[]>(() => safeParse(STORAGE_KEYS.FOLDERS, INITIAL_MEDIA_FOLDERS));
   const [mediaItems, setMediaItems] = useState<MediaItem[]>(() => safeParse(STORAGE_KEYS.MEDIA, INITIAL_MEDIA_ITEMS));
@@ -255,6 +268,10 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
   }, [events]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.DEPARTMENTS, JSON.stringify(departments));
+  }, [departments]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.FOLDERS, JSON.stringify(mediaFolders));
@@ -362,7 +379,8 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const hasRemoteData = Boolean(
         data.churchInfo || 
         (data.schedules && data.schedules.length > 0) ||
-        (data.events && data.events.length > 0)
+        (data.events && data.events.length > 0) ||
+        (data.departments && data.departments.length > 0)
       );
 
       if (hasRemoteData) {
@@ -386,6 +404,7 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
         if (data.schedules && data.schedules.length > 0) setSchedules(data.schedules);
         if (data.events && data.events.length > 0) setEvents(data.events);
+        if (data.departments && data.departments.length > 0) setDepartments(data.departments);
         if (data.mediaFolders && data.mediaFolders.length > 0) setMediaFolders(data.mediaFolders);
         if (data.mediaItems && data.mediaItems.length > 0) setMediaItems(data.mediaItems);
         if (data.prayerRequests && data.prayerRequests.length > 0) setPrayerRequests(data.prayerRequests);
@@ -404,6 +423,7 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           churchInfo,
           schedules,
           events,
+          departments,
           mediaFolders,
           mediaItems,
           prayerRequests,
@@ -422,7 +442,7 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       setIsSyncing(false);
       return { success: false, message: err.message || 'Erro ao sincronizar do Supabase.' };
     }
-  }, [churchInfo, schedules, events, mediaFolders, mediaItems, prayerRequests, members, transactions, users, auditLogs]);
+  }, [churchInfo, schedules, events, departments, mediaFolders, mediaItems, prayerRequests, members, transactions, users, auditLogs]);
 
   // Supabase Push
   const syncToSupabase = useCallback(async () => {
@@ -435,6 +455,7 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       churchInfo,
       schedules,
       events,
+      departments,
       mediaFolders,
       mediaItems,
       prayerRequests,
@@ -451,7 +472,7 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       addAuditLog('Sincronização em Nuvem', 'CONFIGURACAO', 'Backup e sincronização manual enviada ao Supabase PostgreSQL.');
     }
     return result;
-  }, [churchInfo, schedules, events, mediaFolders, mediaItems, prayerRequests, members, transactions, users, auditLogs, addAuditLog]);
+  }, [churchInfo, schedules, events, departments, mediaFolders, mediaItems, prayerRequests, members, transactions, users, auditLogs, addAuditLog]);
 
   // Save Credentials
   const saveCredentials = async (url: string, key: string) => {
@@ -654,6 +675,71 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     addAuditLog('Inscrição em Evento', 'EVENTOS', `Inscrição confirmada para "${regData.name}" no evento "${targetEvent.title}".`);
 
     return { success: true, message: 'Sua inscrição foi confirmada com sucesso! Que Deus abençoe.' };
+  };
+
+  // Departments / Ministérios (Acesso irrestrito a todos os usuários)
+  const addDepartment = (data: Omit<ChurchDepartment, 'id' | 'createdAt'>) => {
+    const cleanCode = data.code.trim().toUpperCase();
+    const cleanName = data.name.trim();
+
+    if (!cleanCode || !cleanName) {
+      return { success: false, message: 'Código/Sigla e Nome do departamento são obrigatórios.' };
+    }
+
+    const duplicate = departments.find(d => d.code.toUpperCase() === cleanCode);
+    if (duplicate) {
+      return { success: false, message: `Já existe um departamento cadastrado com o código "${cleanCode}".` };
+    }
+
+    const newDept: ChurchDepartment = {
+      ...data,
+      id: `dep-${Date.now()}`,
+      code: cleanCode,
+      name: cleanName,
+      createdAt: new Date().toISOString().split('T')[0]
+    };
+
+    setDepartments(prev => [...prev, newDept]);
+    addAuditLog('Novo Departamento Criado', 'DEPARTAMENTOS', `Criado departamento "${newDept.name}" (${newDept.code}) liderado por "${newDept.leader || 'Liderança'}".`);
+    return { success: true, message: 'Departamento cadastrado com sucesso!', department: newDept };
+  };
+
+  const updateDepartment = (id: string, updated: Partial<ChurchDepartment>) => {
+    if (updated.code) {
+      const cleanCode = updated.code.trim().toUpperCase();
+      const duplicate = departments.find(d => d.id !== id && d.code.toUpperCase() === cleanCode);
+      if (duplicate) {
+        return { success: false, message: `Já existe outro departamento com o código "${cleanCode}".` };
+      }
+      updated.code = cleanCode;
+    }
+
+    setDepartments(prev => {
+      const next = prev.map(d => d.id === id ? { ...d, ...updated } : d);
+      return next;
+    });
+
+    const target = departments.find(d => d.id === id);
+    addAuditLog('Departamento Atualizado', 'DEPARTAMENTOS', `Departamento "${target?.name || id}" atualizado.`);
+    return { success: true, message: 'Departamento atualizado com sucesso!' };
+  };
+
+  const deleteDepartment = (id: string) => {
+    const target = departments.find(d => d.id === id);
+    setDepartments(prev => prev.filter(d => d.id !== id));
+    addAuditLog('Departamento Excluído', 'DEPARTAMENTOS', `Departamento "${target?.name || id}" foi excluído.`, 'aviso');
+    return { success: true, message: 'Departamento excluído com sucesso!' };
+  };
+
+  const toggleDepartmentStatus = (id: string) => {
+    setDepartments(prev => {
+      const next = prev.map(d => d.id === id ? { ...d, isActive: !d.isActive } : d);
+      const target = next.find(d => d.id === id);
+      if (target) {
+        addAuditLog('Status de Departamento Alterado', 'DEPARTAMENTOS', `Departamento "${target.name}" ${target.isActive ? 'ativado' : 'desativado'}.`);
+      }
+      return next;
+    });
   };
 
   // Media
@@ -1102,6 +1188,7 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setChurchInfo(INITIAL_CHURCH_INFO);
     setSchedules(INITIAL_SCHEDULES);
     setEvents(INITIAL_EVENTS);
+    setDepartments(INITIAL_DEPARTMENTS);
     setMediaFolders(INITIAL_MEDIA_FOLDERS);
     setMediaItems(INITIAL_MEDIA_ITEMS);
     setPrayerRequests(INITIAL_PRAYER_REQUESTS);
@@ -1119,6 +1206,7 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       churchInfo,
       schedules,
       events,
+      departments,
       mediaFolders,
       mediaItems,
       prayerRequests,
@@ -1143,6 +1231,7 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (parsed.churchInfo) setChurchInfo(parsed.churchInfo);
       if (parsed.schedules) setSchedules(parsed.schedules);
       if (parsed.events) setEvents(parsed.events);
+      if (parsed.departments) setDepartments(parsed.departments);
       if (parsed.mediaFolders) setMediaFolders(parsed.mediaFolders);
       if (parsed.mediaItems) setMediaItems(parsed.mediaItems);
       if (parsed.prayerRequests) setPrayerRequests(parsed.prayerRequests);
@@ -1172,6 +1261,11 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         updateEvent,
         deleteEvent,
         registerEvent,
+        departments,
+        addDepartment,
+        updateDepartment,
+        deleteDepartment,
+        toggleDepartmentStatus,
         mediaFolders,
         mediaItems,
         addMediaFolder,

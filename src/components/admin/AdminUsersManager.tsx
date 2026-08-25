@@ -197,7 +197,7 @@ export const AdminUsersManager: React.FC = () => {
             <Shield className="w-4 h-4" />
             <span>Pastor Titular</span>
           </div>
-          <p className="text-[11px] text-slate-400">Acesso irrestrito a todos os módulos, financeiro, membros e configurações do banco.</p>
+          <p className="text-[11px] text-slate-400">Acesso completo: finanças, membros, departamentos, cultos, eventos e configurações do banco.</p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
@@ -205,7 +205,7 @@ export const AdminUsersManager: React.FC = () => {
             <Shield className="w-4 h-4" />
             <span>Tesouraria</span>
           </div>
-          <p className="text-[11px] text-slate-400">Lançamento de dízimos, ofertas, despesas, recibos térmicos e relatórios de assembleia.</p>
+          <p className="text-[11px] text-slate-400">Dízimos, ofertas, despesas, recibos, relatórios, configurações e criação de departamentos.</p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
@@ -213,7 +213,7 @@ export const AdminUsersManager: React.FC = () => {
             <Shield className="w-4 h-4" />
             <span>Secretaria & Mídia</span>
           </div>
-          <p className="text-[11px] text-slate-400">Gestão de horários de cultos, publicações de eventos, fotos, vídeos e pedidos de oração.</p>
+          <p className="text-[11px] text-slate-400">Cultos, eventos, fotos, vídeos, orações, configurações e criação de departamentos.</p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">
@@ -221,7 +221,7 @@ export const AdminUsersManager: React.FC = () => {
             <Shield className="w-4 h-4" />
             <span>Líder de Ministério</span>
           </div>
-          <p className="text-[11px] text-slate-400">Acesso a programações do ministério (ADOBRAC, UFEBRAC, Jovens) e orações.</p>
+          <p className="text-[11px] text-slate-400">Criação de departamentos, gestão de programações ministeriais, orações e configurações.</p>
         </div>
       </div>
 

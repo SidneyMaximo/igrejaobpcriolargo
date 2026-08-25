@@ -12,7 +12,9 @@ import {
   ArrowRight,
   Sparkles,
   Lock,
-  PlusCircle
+  PlusCircle,
+  Building2,
+  Settings
 } from 'lucide-react';
 import { useChurch } from '../../context/ChurchContext';
 
@@ -29,6 +31,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({ onNavigateTab }) =
     mediaItems, 
     prayerRequests, 
     members,
+    departments,
     adminSession,
     isSigiloModeActive
   } = useChurch();
@@ -50,24 +53,24 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({ onNavigateTab }) =
             Bem-vindo(a), {adminSession?.username && !adminSession.username.includes('Carlos') ? adminSession.username : 'Pr. Janildo Manoel'}
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-            Painel administrativo da Igreja O Brasil Para Cristo. Atualize os cultos, fotos, vídeos, gabinete de oração e controle a tesouraria com sigilo pastoral.
+            Painel administrativo da Igreja O Brasil Para Cristo. Gerencie cultos, eventos, departamentos, fotos, orações, configurações e controle a tesouraria com sigilo.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           <button
-            onClick={() => onNavigateTab('tesouraria')}
+            onClick={() => onNavigateTab('departamentos')}
             className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs px-4 py-3 rounded-xl shadow-md transition-all"
           >
-            <PlusCircle className="w-4 h-4 text-slate-950" />
-            <span>Lançar Dízimo / Entrada</span>
+            <Building2 className="w-4 h-4 text-slate-950" />
+            <span>Criar Departamento</span>
           </button>
           <button
-            onClick={() => onNavigateTab('midia')}
+            onClick={() => onNavigateTab('supabase')}
             className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs px-4 py-3 rounded-xl border border-slate-700 transition-all"
           >
-            <ImageIcon className="w-4 h-4 text-amber-400" />
-            <span>Nova Foto / Vídeo</span>
+            <Settings className="w-4 h-4 text-amber-400" />
+            <span>Configurações</span>
           </button>
         </div>
       </div>
@@ -244,7 +247,34 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({ onNavigateTab }) =
           </div>
         </button>
 
-        {/* Box 4: Gabinete de Oração */}
+        {/* Box 4: Departamentos */}
+        <button
+          onClick={() => onNavigateTab('departamentos')}
+          className="bg-slate-900 border border-slate-800 hover:border-amber-500/40 rounded-2xl p-5 text-left transition-all hover:shadow-xl group flex flex-col justify-between"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <span className="text-xs font-bold text-slate-400 bg-slate-950 px-2 py-0.5 rounded">
+              {departments.length} departamentos
+            </span>
+          </div>
+          <div>
+            <h4 className="font-bold text-white text-base group-hover:text-amber-300 transition-colors">
+              Departamentos & Ministérios
+            </h4>
+            <p className="text-xs text-slate-400 mt-1">
+              Criar departamentos, líderes, cores e horários.
+            </p>
+          </div>
+          <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-amber-400 font-semibold">
+            <span>Gerenciar</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </div>
+        </button>
+
+        {/* Box 5: Gabinete de Oração */}
         <button
           onClick={() => onNavigateTab('oracao')}
           className="bg-slate-900 border border-slate-800 hover:border-amber-500/40 rounded-2xl p-5 text-left transition-all hover:shadow-xl group flex flex-col justify-between"

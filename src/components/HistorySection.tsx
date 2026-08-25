@@ -10,13 +10,17 @@ import {
   Clock, 
   Users, 
   Sparkles, 
-  ShieldCheck,
-  Quote,
-  ExternalLink,
-  Heart
+  ShieldCheck, 
+  Quote, 
+  ExternalLink, 
+  Heart,
+  Zap,
+  Music
 } from 'lucide-react';
+import { useChurch } from '../context/ChurchContext';
 
 export const HistorySection: React.FC = () => {
+  const { departments } = useChurch();
   const [activeTab, setActiveTab] = useState<'timeline' | 'founder' | 'legacy'>('timeline');
   const [selectedTimelineIndex, setSelectedTimelineIndex] = useState(0);
 
@@ -302,55 +306,70 @@ export const HistorySection: React.FC = () => {
         {/* Tab 3: Legacy & Departments */}
         {activeTab === 'legacy' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            <div className="bg-slate-50 rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-[#70b83b] transition-colors">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-emerald-100 text-[#70b83b] flex items-center justify-center mb-3">
-                  <Users className="w-5 h-5" />
-                </div>
-                <h4 className="text-base font-bold text-slate-900 mb-1">JUBRAC</h4>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  <strong>Juventude de O Brasil Para Cristo:</strong> Responsável pela união, capacitação, congressos e despertamento espiritual dos jovens.
-                </p>
-              </div>
-            </div>
+            {departments.filter(d => d.isActive).map((dept) => {
+              const getDeptIcon = (iconName?: string) => {
+                switch (iconName) {
+                  case 'heart': return <Heart className="w-5 h-5" />;
+                  case 'shield': return <ShieldCheck className="w-5 h-5" />;
+                  case 'sparkles': return <Sparkles className="w-5 h-5" />;
+                  case 'zap': return <Zap className="w-5 h-5" />;
+                  case 'music': return <Music className="w-5 h-5" />;
+                  case 'flame': return <Flame className="w-5 h-5" />;
+                  case 'book-open': return <BookOpen className="w-5 h-5" />;
+                  case 'users':
+                  default:
+                    return <Users className="w-5 h-5" />;
+                }
+              };
 
-            <div className="bg-slate-50 rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-rose-400 transition-colors">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center mb-3">
-                  <Heart className="w-5 h-5" />
-                </div>
-                <h4 className="text-base font-bold text-slate-900 mb-1">UFEBRAC</h4>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  <strong>União Feminina:</strong> Círculo de Oração, intercessão contínua pelas famílias e suporte comunitário.
-                </p>
-              </div>
-            </div>
+              const getDeptColorClass = (colorTag?: string) => {
+                switch (colorTag) {
+                  case 'rose': return { box: 'bg-rose-100 text-rose-600', border: 'hover:border-rose-400' };
+                  case 'blue': return { box: 'bg-blue-100 text-blue-600', border: 'hover:border-blue-400' };
+                  case 'amber': return { box: 'bg-amber-100 text-amber-600', border: 'hover:border-amber-400' };
+                  case 'purple': return { box: 'bg-purple-100 text-purple-600', border: 'hover:border-purple-400' };
+                  case 'sky': return { box: 'bg-sky-100 text-sky-600', border: 'hover:border-sky-400' };
+                  case 'indigo': return { box: 'bg-indigo-100 text-indigo-600', border: 'hover:border-indigo-400' };
+                  case 'teal': return { box: 'bg-teal-100 text-teal-600', border: 'hover:border-teal-400' };
+                  case 'emerald':
+                  default:
+                    return { box: 'bg-emerald-100 text-[#70b83b]', border: 'hover:border-[#70b83b]' };
+                }
+              };
 
-            <div className="bg-slate-50 rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-blue-400 transition-colors">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center mb-3">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <h4 className="text-base font-bold text-slate-900 mb-1">MENBRAC</h4>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  <strong>Ministério de Homens:</strong> Formação de sacerdotes do lar, fortalecimento de pais de família e evangelismo.
-                </p>
-              </div>
-            </div>
+              const style = getDeptColorClass(dept.colorTag);
 
-            <div className="bg-slate-50 rounded-xl border border-slate-200 p-6 flex flex-col justify-between hover:border-amber-400 transition-colors">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center mb-3">
-                  <Sparkles className="w-5 h-5" />
-                </div>
-                <h4 className="text-base font-bold text-slate-900 mb-1">UCEBRAC</h4>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  <strong>União de Crianças:</strong> Ensino bíblico infantil e valores cristãos na infância.
-                </p>
-              </div>
-            </div>
+              return (
+                <div 
+                  key={dept.id} 
+                  className={`bg-slate-50 rounded-xl border border-slate-200 p-6 flex flex-col justify-between ${style.border} transition-colors`}
+                >
+                  <div>
+                    <div className={`w-10 h-10 rounded-lg ${style.box} flex items-center justify-center mb-3`}>
+                      {getDeptIcon(dept.iconName)}
+                    </div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">
+                        {dept.code}
+                      </span>
+                      <h4 className="text-base font-bold text-slate-900 truncate">
+                        {dept.name}
+                      </h4>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      {dept.description}
+                    </p>
+                  </div>
 
+                  {(dept.leader || dept.meetingSchedule) && (
+                    <div className="mt-4 pt-3 border-t border-slate-200/80 text-[11px] text-slate-600 space-y-0.5">
+                      {dept.leader && <p><strong className="text-slate-700">Líder:</strong> {dept.leader}</p>}
+                      {dept.meetingSchedule && <p><strong className="text-slate-700">Reuniões:</strong> {dept.meetingSchedule}</p>}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 

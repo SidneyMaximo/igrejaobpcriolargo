@@ -160,6 +160,25 @@ export interface FinancialSummary {
 }
 
 // ==============================================================================
+// GESTÃO DE DEPARTAMENTOS E MINISTÉRIOS
+// ==============================================================================
+export interface ChurchDepartment {
+  id: string;
+  code: string; // Ex: 'JUBRAC', 'UFEBRAC', 'MENBRAC', 'UCEBRAC', 'ADOBRAC'
+  name: string; // Ex: 'JUBRAC (Juventude)'
+  description: string;
+  leader: string;
+  meetingSchedule?: string; // Ex: 'Sábados às 19:30'
+  colorTag: 'amber' | 'rose' | 'emerald' | 'blue' | 'purple' | 'sky' | 'indigo' | 'teal' | string;
+  iconName?: string; // 'users', 'heart', 'shield', 'sparkles', 'zap', 'music', 'book-open', 'flame'
+  bannerUrl?: string;
+  instagramUrl?: string;
+  isActive: boolean;
+  order: number;
+  createdAt?: string;
+}
+
+// ==============================================================================
 // GESTÃO DE USUÁRIOS E CONTROLE DE ACESSO
 // ==============================================================================
 export interface SystemUser {
@@ -187,6 +206,7 @@ export type LogActionCategory =
   | 'CULTOS' 
   | 'MIDIA' 
   | 'ORACAO' 
+  | 'DEPARTAMENTOS'
   | 'USUARIOS' 
   | 'CONFIGURACAO' 
   | 'SISTEMA';

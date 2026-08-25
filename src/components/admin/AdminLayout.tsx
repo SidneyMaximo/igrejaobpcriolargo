@@ -4,6 +4,7 @@ import {
   LayoutDashboard, 
   Clock, 
   Calendar, 
+  Building2,
   Image as ImageIcon, 
   DollarSign, 
   Heart, 
@@ -23,6 +24,7 @@ import { useChurch } from '../../context/ChurchContext';
 import { AdminOverview } from './AdminOverview';
 import { AdminSchedules } from './AdminSchedules';
 import { AdminEvents } from './AdminEvents';
+import { AdminDepartmentsManager } from './AdminDepartmentsManager';
 import { AdminMediaManager } from './AdminMediaManager';
 import { AdminFinancialCRM } from './AdminFinancialCRM';
 import { AdminPrayers } from './AdminPrayers';
@@ -35,7 +37,7 @@ interface AdminLayoutProps {
 }
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ onBackToPublicSite }) => {
-  const { adminSession, logoutAdmin, churchInfo, prayerRequests, auditLogs, users } = useChurch();
+  const { adminSession, logoutAdmin, churchInfo, prayerRequests, auditLogs, users, departments } = useChurch();
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -45,12 +47,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onBackToPublicSite }) 
     { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
     { id: 'cultos', label: 'Cultos & Horários', icon: Clock },
     { id: 'eventos', label: 'Eventos & Congressos', icon: Calendar },
+    { id: 'departamentos', label: 'Departamentos & Ministérios', icon: Building2, badge: `${departments.length}` },
     { id: 'midia', label: 'Pastas de Mídia (Fotos/Vídeos)', icon: ImageIcon },
     { id: 'tesouraria', label: 'CRM de Dízimos & Tesouraria', icon: DollarSign, badge: 'Sigilo' },
     { id: 'oracao', label: 'Gabinete de Oração', icon: Heart, count: pendingPrayers },
     { id: 'usuarios', label: 'Usuários & Senhas', icon: Users, badge: `${users.length}` },
     { id: 'logs', label: 'Auditoria & Logs', icon: ShieldAlert, badge: `${auditLogs.length}` },
-    { id: 'supabase', label: 'Supabase & Configurações', icon: Database }
+    { id: 'supabase', label: 'Configurações & Banco', icon: Database }
   ];
 
   const handleLogout = () => {
@@ -198,6 +201,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onBackToPublicSite }) 
           )}
           {activeTab === 'cultos' && <AdminSchedules />}
           {activeTab === 'eventos' && <AdminEvents />}
+          {activeTab === 'departamentos' && <AdminDepartmentsManager />}
           {activeTab === 'midia' && <AdminMediaManager />}
           {activeTab === 'tesouraria' && <AdminFinancialCRM />}
           {activeTab === 'oracao' && <AdminPrayers />}

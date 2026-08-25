@@ -9,15 +9,35 @@ import {
   Terminal, 
   UploadCloud, 
   DownloadCloud, 
-  CheckCircle2 
+  CheckCircle2,
+  Building2,
+  Plus,
+  Users,
+  Layers,
+  Sparkles,
+  Edit3,
+  Key,
+  Link,
+  ShieldCheck,
+  Eye,
+  EyeOff,
+  RotateCcw
 } from 'lucide-react';
-import { SUPABASE_SCHEMA_SQL } from '../../lib/supabase';
+import { 
+  SUPABASE_SCHEMA_SQL, 
+  getSupabaseCredentials, 
+  DEFAULT_SUPABASE_URL, 
+  DEFAULT_SUPABASE_ANON_KEY 
+} from '../../lib/supabase';
 import { useChurch } from '../../context/ChurchContext';
 
 export const AdminSupabaseSettings: React.FC = () => {
   const { 
     schedules, 
     events, 
+    departments,
+    addDepartment,
+    toggleDepartmentStatus,
     mediaFolders, 
     mediaItems, 
     transactions, 
@@ -30,12 +50,22 @@ export const AdminSupabaseSettings: React.FC = () => {
     isSyncing,
     syncToSupabase,
     syncFromSupabase,
-    checkSupabaseHealth
+    checkSupabaseHealth,
+    saveCredentials,
+    clearCredentials
   } = useChurch();
 
   const [copied, setCopied] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [testingConnection, setTestingConnection] = useState(false);
+  const [savingCreds, setSavingCreds] = useState(false);
+  const [showKey, setShowKey] = useState(false);
+
+  // Supabase credentials state
+  const initialCreds = getSupabaseCredentials();
+  const [supabaseUrlInput, setSupabaseUrlInput] = useState(initialCreds.url);
+  const [supabaseKeyInput, setSupabaseKeyInput] = useState(initialCreds.key);
+  const [isCustomCreds, setIsCustomCreds] = useState(initialCreds.isCustom);
 
   // Church info form
   const [name, setName] = useState(churchInfo.name);
@@ -65,6 +95,42 @@ export const AdminSupabaseSettings: React.FC = () => {
     setTimeout(() => setCopied(false), 3000);
   };
 
+  const handleSaveCredentials = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supabaseUrlInput.trim() || !supabaseKeyInput.trim()) {
+      setFeedbackMsg({ type: 'error', text: 'Preencha a URL do projeto e a Anon Key do Supabase.' });
+      return;
+    }
+
+    setSavingCreds(true);
+    const res = await saveCredentials(supabaseUrlInput.trim(), supabaseKeyInput.trim());
+    setSavingCreds(false);
+
+    if (res.success) {
+      setIsCustomCreds(true);
+      setFeedbackMsg({ type: 'success', text: 'Credenciais do Supabase salvas e conectadas com sucesso!' });
+    } else {
+      setFeedbackMsg({ type: 'error', text: res.message });
+    }
+  };
+
+  const handleRestoreDefaultCreds = async () => {
+    clearCredentials();
+    setSupabaseUrlInput(DEFAULT_SUPABASE_URL);
+    setSupabaseKeyInput(DEFAULT_SUPABASE_ANON_KEY);
+    setIsCustomCreds(false);
+    
+    setTestingConnection(true);
+    const res = await checkSupabaseHealth();
+    setTestingConnection(false);
+
+    if (res.success) {
+      setFeedbackMsg({ type: 'success', text: 'Restaurado para as credenciais padrão do sistema (.env) e conectado!' });
+    } else {
+      setFeedbackMsg({ type: 'info', text: 'Restaurado para padrão do sistema. ' + res.message });
+    }
+  };
+
   const handleTestConnection = async () => {
     setTestingConnection(true);
     const result = await checkSupabaseHealth();
@@ -78,7 +144,7 @@ export const AdminSupabaseSettings: React.FC = () => {
   };
 
   const handlePushData = async () => {
-    const confirm = window.confirm('Deseja enviar todos os dados locais atuais (cultos, eventos, membros, mídias, transações) para o Supabase?');
+    const confirm = window.confirm('Deseja enviar todos os dados locais atuais (cultos, eventos, departamentos, membros, mídias, transações) para o Supabase?');
     if (!confirm) return;
 
     const res = await syncToSupabase();
@@ -107,6 +173,7 @@ export const AdminSupabaseSettings: React.FC = () => {
       churchInfo,
       schedules,
       events,
+      departments,
       mediaFolders,
       mediaItems,
       transactions,
@@ -235,15 +302,122 @@ export const AdminSupabaseSettings: React.FC = () => {
 
         {/* Feedback Alert */}
         {feedbackMsg && (
-          <div className={`p-3 rounded-xl text-xs flex items-center gap-2 border ${
+          <div className={`p-3 rounded-xl text-xs flex items-center justify-between gap-2 border ${
             feedbackMsg.type === 'success' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' :
             feedbackMsg.type === 'error' ? 'bg-rose-500/10 text-rose-300 border-rose-500/30' :
             'bg-sky-500/10 text-sky-300 border-sky-500/30'
           }`}>
-            {feedbackMsg.type === 'success' ? <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
-            <span>{feedbackMsg.text}</span>
+            <div className="flex items-center gap-2">
+              {feedbackMsg.type === 'success' ? <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
+              <span>{feedbackMsg.text}</span>
+            </div>
+            <button 
+              onClick={() => setFeedbackMsg(null)}
+              className="text-[11px] opacity-70 hover:opacity-100 uppercase font-mono font-bold"
+            >
+              Fechar
+            </button>
           </div>
         )}
+
+        {/* Supabase Credentials Configuration Form */}
+        <div className="bg-slate-950/70 border border-slate-800/90 rounded-2xl p-5 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h5 className="text-sm font-bold text-white flex items-center gap-2">
+                <Key className="w-4 h-4 text-amber-400" />
+                <span>Credenciais do Projeto Supabase</span>
+              </h5>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                Defina a URL da API e a Chave Pública (Anon/Publishable Key) para sincronizar dados em tempo real no PostgreSQL.
+              </p>
+            </div>
+            <span className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-full border self-start sm:self-auto ${
+              isCustomCreds 
+                ? 'bg-amber-500/10 text-amber-300 border-amber-500/30' 
+                : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+            }`}>
+              {isCustomCreds ? '• Credenciais Customizadas (LocalStorage)' : '• Credenciais Padrão do Sistema (.env)'}
+            </span>
+          </div>
+
+          <form onSubmit={handleSaveCredentials} className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+                  <Link className="w-3.5 h-3.5 text-amber-400" />
+                  <span>URL do Projeto Supabase (API URL)</span>
+                </label>
+                <input
+                  type="url"
+                  required
+                  value={supabaseUrlInput}
+                  onChange={(e) => setSupabaseUrlInput(e.target.value)}
+                  placeholder="https://exemplo.supabase.co"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <Key className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Chave Anônima / Publishable Key (Anon Key)</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowKey(!showKey)}
+                    className="text-[11px] text-slate-400 hover:text-white inline-flex items-center gap-1"
+                  >
+                    {showKey ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                    <span>{showKey ? 'Ocultar' : 'Visualizar'}</span>
+                  </button>
+                </label>
+                <input
+                  type={showKey ? 'text' : 'password'}
+                  required
+                  value={supabaseKeyInput}
+                  onChange={(e) => setSupabaseKeyInput(e.target.value)}
+                  placeholder="sb_publishable_... ou eyJhbGciOi..."
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-amber-400 font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="submit"
+                  disabled={savingCreds}
+                  className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow disabled:opacity-50"
+                >
+                  {savingCreds ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <ShieldCheck className="w-3.5 h-3.5" />}
+                  <span>Salvar &amp; Conectar Supabase</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleRestoreDefaultCreds}
+                  disabled={savingCreds || testingConnection}
+                  className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs px-3.5 py-2 rounded-xl border border-slate-700 transition-all shadow disabled:opacity-50"
+                  title="Restaurar para as credenciais oficiais configuradas no arquivo .env"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Restaurar Padrão do Sistema</span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleCopySql}
+                className="inline-flex items-center gap-1.5 text-xs text-amber-400 hover:text-amber-300 transition-colors"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copied ? 'Script SQL Copiado!' : 'Copiar Script SQL das 12 Tabelas'}</span>
+              </button>
+            </div>
+          </form>
+        </div>
 
         {/* Sincronização Push / Pull */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -574,6 +748,54 @@ export const AdminSupabaseSettings: React.FC = () => {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Departments Overview Card inside Settings */}
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-bold text-white text-base">Departamentos & Ministérios da Igreja</h4>
+              <p className="text-xs text-slate-400">
+                Departamentos ativos exibidos no site e associados aos cultos ({departments.length} cadastrados).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
+          {departments.map((d) => (
+            <div 
+              key={d.id}
+              className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 flex items-center justify-between gap-3"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0 font-bold text-xs">
+                  {d.code.substring(0, 3)}
+                </div>
+                <div className="min-w-0">
+                  <span className="text-xs font-bold text-white block truncate">{d.name}</span>
+                  <span className="text-[10px] text-slate-400 block truncate">Líder: {d.leader || 'Liderança'}</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => toggleDepartmentStatus(d.id)}
+                className={`text-[10px] font-bold px-2 py-0.5 rounded-full border transition-colors shrink-0 ${
+                  d.isActive
+                    ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                    : 'bg-rose-500/10 text-rose-300 border-rose-500/30'
+                }`}
+                title="Alternar Ativo/Inativo"
+              >
+                {d.isActive ? 'Ativo' : 'Inativo'}
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
     </div>

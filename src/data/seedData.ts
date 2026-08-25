@@ -8,7 +8,8 @@ import {
   ChurchMember,
   FinancialTransaction,
   SystemUser,
-  AuditLog
+  AuditLog,
+  ChurchDepartment
 } from '../types';
 
 export const INITIAL_CHURCH_INFO: ChurchInfo = {
@@ -470,4 +471,86 @@ export const INITIAL_AUDIT_LOGS: AuditLog[] = [
     status: 'sucesso'
   }
 ];
+
+export const INITIAL_DEPARTMENTS: ChurchDepartment[] = [
+  {
+    id: 'dep-1',
+    code: 'JUBRAC',
+    name: 'JUBRAC (Juventude)',
+    description: 'Juventude de O Brasil Para Cristo: Responsável pela união, capacitação, congressos e despertamento espiritual dos jovens.',
+    leader: 'Liderança JUBRAC',
+    meetingSchedule: 'Sábados às 19:30',
+    colorTag: 'emerald',
+    iconName: 'users',
+    isActive: true,
+    order: 1,
+    createdAt: '2026-01-10'
+  },
+  {
+    id: 'dep-2',
+    code: 'UFEBRAC',
+    name: 'UFEBRAC (Mulheres)',
+    description: 'União Feminina: Círculo de Oração, intercessão contínua pelas famílias e suporte comunitário.',
+    leader: 'Liderança UFEBRAC',
+    meetingSchedule: 'Segundas e Terças às 19:30',
+    colorTag: 'rose',
+    iconName: 'heart',
+    isActive: true,
+    order: 2,
+    createdAt: '2026-01-10'
+  },
+  {
+    id: 'dep-3',
+    code: 'MENBRAC',
+    name: 'MENBRAC (Homens)',
+    description: 'Ministério de Homens: Formação de sacerdotes do lar, fortalecimento de pais de família e evangelismo.',
+    leader: 'Liderança MENBRAC',
+    meetingSchedule: 'Quintas às 19:30',
+    colorTag: 'blue',
+    iconName: 'shield',
+    isActive: true,
+    order: 3,
+    createdAt: '2026-01-10'
+  },
+  {
+    id: 'dep-4',
+    code: 'UCEBRAC',
+    name: 'UCEBRAC (Crianças)',
+    description: 'União de Crianças: Ensino bíblico infantil, escola bíblica e valores cristãos na infância.',
+    leader: 'Liderança UCEBRAC',
+    meetingSchedule: 'Domingos às 09:00 e 18:30',
+    colorTag: 'amber',
+    iconName: 'sparkles',
+    isActive: true,
+    order: 4,
+    createdAt: '2026-01-10'
+  },
+  {
+    id: 'dep-5',
+    code: 'ADOBRAC',
+    name: 'ADOBRAC (Adolescentes)',
+    description: 'Adolescentes de O Brasil Para Cristo: Cultos temáticos, discipulado bíblico e comunhão entre os adolescentes.',
+    leader: 'Liderança ADOBRAC',
+    meetingSchedule: 'Quartas e Quintas às 19:30',
+    colorTag: 'purple',
+    iconName: 'zap',
+    isActive: true,
+    order: 5,
+    createdAt: '2026-01-10'
+  },
+  {
+    id: 'dep-6',
+    code: 'LOUVOR',
+    name: 'Ministério de Louvor & Adoração',
+    description: 'Banda, coral e instrumentistas dedicados a conduzir a igreja em profunda adoração a Deus.',
+    leader: 'Ministério de Louvor',
+    meetingSchedule: 'Ensaios aos Sábados às 17:00',
+    colorTag: 'sky',
+    iconName: 'music',
+    isActive: true,
+    order: 6,
+    createdAt: '2026-01-10'
+  }
+];
+
 

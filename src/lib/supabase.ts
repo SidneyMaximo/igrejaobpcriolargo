@@ -10,7 +10,8 @@ import {
   ChurchMember,
   FinancialTransaction,
   SystemUser,
-  AuditLog
+  AuditLog,
+  ChurchDepartment
 } from '../types';
 
 // ==============================================================================
@@ -19,21 +20,24 @@ import {
 const STORAGE_SUPABASE_URL = 'obpc_supabase_url_v1';
 const STORAGE_SUPABASE_KEY = 'obpc_supabase_anon_key_v1';
 
+export const DEFAULT_SUPABASE_URL = 'https://pgbmlczhzihihzbxmias.supabase.co';
+export const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_Vb4eWeibhcl2SRhCDkoigg_MAXZvXjx';
+
 export const getSupabaseCredentials = (): { url: string; key: string; isCustom: boolean } => {
   const env = (import.meta as any).env || {};
   const customUrl = localStorage.getItem(STORAGE_SUPABASE_URL);
   const customKey = localStorage.getItem(STORAGE_SUPABASE_KEY);
 
-  if (customUrl && customKey) {
+  if (customUrl && customKey && customUrl.trim() && customKey.trim()) {
     return { url: customUrl.trim(), key: customKey.trim(), isCustom: true };
   }
 
-  const envUrl = env.VITE_SUPABASE_URL || env.SUPABASE_URL || 'https://pgbmlczhzihihzbxmias.supabase.co';
-  const envKey = env.VITE_SUPABASE_ANON_KEY || env.SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_Vb4eWeibhcl2SRhCDkoigg_MAXZvXjx';
+  const envUrl = env.VITE_SUPABASE_URL || env.SUPABASE_URL || DEFAULT_SUPABASE_URL;
+  const envKey = env.VITE_SUPABASE_ANON_KEY || env.SUPABASE_PUBLISHABLE_KEY || DEFAULT_SUPABASE_ANON_KEY;
 
   return {
-    url: envUrl.trim(),
-    key: envKey.trim(),
+    url: (envUrl || DEFAULT_SUPABASE_URL).trim(),
+    key: (envKey || DEFAULT_SUPABASE_ANON_KEY).trim(),
     isCustom: false
   };
 };
@@ -81,7 +85,17 @@ export const saveCustomCredentials = (url: string, key: string): boolean => {
     if (cleanUrl && cleanKey) {
       localStorage.setItem(STORAGE_SUPABASE_URL, cleanUrl);
       localStorage.setItem(STORAGE_SUPABASE_KEY, cleanKey);
-      currentClient = createClient(cleanUrl, cleanKey);
+      currentClient = createClient(cleanUrl, cleanKey, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true
+        },
+        realtime: {
+          params: {
+            eventsPerSecond: 10
+          }
+        }
+      });
       return true;
     }
     return false;
@@ -283,6 +297,23 @@ CREATE TABLE IF NOT EXISTS audit_logs (
   details TEXT NOT NULL,
   ip_address TEXT,
   status TEXT NOT NULL DEFAULT 'sucesso',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+-- 12. Departamentos e Ministérios da Igreja
+CREATE TABLE IF NOT EXISTS church_departments (
+  id TEXT PRIMARY KEY,
+  code TEXT NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT,
+  leader TEXT,
+  meeting_schedule TEXT,
+  color_tag TEXT DEFAULT 'emerald',
+  icon_name TEXT DEFAULT 'users',
+  banner_url TEXT,
+  instagram_url TEXT,
+  is_active BOOLEAN DEFAULT true,
+  order_index INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
@@ -674,6 +705,37 @@ export const toAuditLog = (row: any): AuditLog => ({
   status: row.status || 'sucesso'
 });
 
+export const toDepartment = (row: any): ChurchDepartment => ({
+  id: row.id,
+  code: row.code,
+  name: row.name,
+  description: row.description || '',
+  leader: row.leader || 'Liderança',
+  meetingSchedule: row.meeting_schedule || undefined,
+  colorTag: row.color_tag || 'emerald',
+  iconName: row.icon_name || 'users',
+  bannerUrl: row.banner_url || undefined,
+  instagramUrl: row.instagram_url || undefined,
+  isActive: row.is_active ?? true,
+  order: row.order_index ?? 0,
+  createdAt: row.created_at ? new Date(row.created_at).toISOString().split('T')[0] : '2026-01-10'
+});
+
+export const fromDepartment = (d: ChurchDepartment) => ({
+  id: d.id,
+  code: d.code,
+  name: d.name,
+  description: d.description,
+  leader: d.leader,
+  meeting_schedule: d.meetingSchedule || null,
+  color_tag: d.colorTag || 'emerald',
+  icon_name: d.iconName || 'users',
+  banner_url: d.bannerUrl || null,
+  instagram_url: d.instagramUrl || null,
+  is_active: d.isActive,
+  order_index: d.order || 0
+});
+
 export const fromAuditLog = (l: AuditLog) => ({
   id: l.id,
   timestamp: l.timestamp,
@@ -691,7 +753,7 @@ export const fromAuditLog = (l: AuditLog) => ({
 // ==============================================================================
 
 export const supabaseService = {
-  // Testar Conexão
+  // Testar Conexão com Supabase
   async testConnection(): Promise<{ success: boolean; message: string; details?: any }> {
     const client = getSupabase();
     if (!client) {
@@ -699,17 +761,27 @@ export const supabaseService = {
     }
 
     try {
-      const { data, error } = await client.from('church_info').select('id').limit(1);
+      const queryPromise = client.from('church_info').select('id').limit(1);
+      const timeoutPromise = new Promise<{ error: { message: string } }>((_, reject) =>
+        setTimeout(() => reject(new Error('Tempo limite excedido ao conectar ao Supabase (timeout 8s).')), 8000)
+      );
+
+      const { data, error }: any = await Promise.race([queryPromise, timeoutPromise]);
+
       if (error) {
-        if (error.code === '42P01') {
+        if (error.code === '42P01' || (error.message && error.message.includes('relation') && error.message.includes('does not exist'))) {
           return {
-            success: false,
-            message: 'Conectado ao Supabase, mas as tabelas ainda não foram criadas. Execute o script SQL no SQL Editor do Supabase.'
+            success: true,
+            message: 'Conectado ao Supabase com sucesso! Tabelas ainda não foram criadas. Clique em "Sincronizar Local > Supabase" para criar e popular os dados.',
+            details: { tablesNeedInit: true }
           };
         }
-        return { success: false, message: `Erro ao conectar: ${error.message}` };
+        if (error.code === 'PGRST301' || error.message?.includes('JWT') || error.message?.includes('apikey') || error.message?.includes('Invalid API key')) {
+          return { success: false, message: `Chave de API (Anon Key) inválida: ${error.message}` };
+        }
+        return { success: false, message: `Erro ao consultar Supabase: ${error.message}` };
       }
-      return { success: true, message: 'Conexão com o Supabase PostgreSQL estabelecida com sucesso!', details: data };
+      return { success: true, message: 'Conexão com o Supabase PostgreSQL testada e ativa!', details: data };
     } catch (err: any) {
       return { success: false, message: `Falha na conexão: ${err.message || err}` };
     }
@@ -725,6 +797,7 @@ export const supabaseService = {
         infoRes,
         schedulesRes,
         eventsRes,
+        departmentsRes,
         foldersRes,
         itemsRes,
         prayersRes,
@@ -736,6 +809,7 @@ export const supabaseService = {
         client.from('church_info').select('*').limit(1).maybeSingle(),
         client.from('weekly_schedules').select('*').order('order_index', { ascending: true }),
         client.from('church_events').select('*').order('date', { ascending: true }),
+        client.from('church_departments').select('*').order('order_index', { ascending: true }),
         client.from('media_folders').select('*').order('created_at', { ascending: false }),
         client.from('media_items').select('*').order('created_at', { ascending: false }),
         client.from('prayer_requests').select('*').order('created_at', { ascending: false }),
@@ -749,6 +823,7 @@ export const supabaseService = {
         churchInfo: infoRes.data ? toChurchInfo(infoRes.data) : null,
         schedules: schedulesRes.data ? schedulesRes.data.map(toSchedule) : null,
         events: eventsRes.data ? eventsRes.data.map(toEvent) : null,
+        departments: departmentsRes.data ? departmentsRes.data.map(toDepartment) : null,
         mediaFolders: foldersRes.data ? foldersRes.data.map(toMediaFolder) : null,
         mediaItems: itemsRes.data ? itemsRes.data.map(toMediaItem) : null,
         prayerRequests: prayersRes.data ? prayersRes.data.map(toPrayerRequest) : null,
@@ -776,6 +851,7 @@ export const supabaseService = {
     churchInfo: ChurchInfo;
     schedules: WeeklySchedule[];
     events: ChurchEvent[];
+    departments?: ChurchDepartment[];
     mediaFolders: MediaFolder[];
     mediaItems: MediaItem[];
     prayerRequests: PrayerRequest[];
@@ -801,6 +877,11 @@ export const supabaseService = {
       // 3. Events
       if (data.events.length > 0) {
         await client.from('church_events').upsert(data.events.map(fromEvent));
+      }
+
+      // 3.1 Departments
+      if (data.departments && data.departments.length > 0) {
+        await client.from('church_departments').upsert(data.departments.map(fromDepartment));
       }
 
       // 4. Media Folders
@@ -843,6 +924,18 @@ export const supabaseService = {
       console.error('Erro ao enviar dados para Supabase:', err);
       return { success: false, message: `Erro na sincronização: ${err.message || err}` };
     }
+  },
+
+  async upsertDepartment(dept: ChurchDepartment) {
+    const client = getSupabase();
+    if (!client) return;
+    await client.from('church_departments').upsert(fromDepartment(dept));
+  },
+
+  async deleteDepartment(id: string) {
+    const client = getSupabase();
+    if (!client) return;
+    await client.from('church_departments').delete().eq('id', id);
   },
 
   // CRUD Granulares

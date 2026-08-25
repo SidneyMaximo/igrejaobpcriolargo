@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { 
+  Church,
   Heart, 
   Lock, 
   Send, 
@@ -19,7 +20,7 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ onOpenAdminLogin, onNavigate }) => {
-  const { churchInfo, adminSession } = useChurch();
+  const { churchInfo, adminSession, departments } = useChurch();
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSent, setNewsletterSent] = useState(false);
 
@@ -31,30 +32,31 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdminLogin, onNavigate }) 
     e.preventDefault();
     if (!newsletterEmail.trim()) return;
     setNewsletterSent(true);
-    setTimeout(() => {
-      setNewsletterSent(false);
-      setNewsletterEmail('');
-    }, 4000);
+    setNewsletterEmail('');
+    setTimeout(() => setNewsletterSent(false), 5000);
   };
 
   return (
-    <footer className="bg-[#040f33] bg-[url('/bg-obpc.svg')] bg-cover bg-center text-white pt-16 pb-12 relative overflow-hidden border-t border-blue-900/40">
-      {/* Dark overlay for contrast */}
-      <div className="absolute inset-0 bg-slate-950/85 pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Top 3 Columns Grid (Direct match to Template) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12 pb-14 border-b border-slate-800">
+    <footer className="bg-[#1f2229] text-slate-400 font-sans border-t border-slate-800">
+      
+      {/* 1. TOP MAIN FOOTER INFO */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 lg:gap-10">
           
-          {/* Col 1: Cursive / Bold Brand (Hope style) */}
+          {/* Col 1: Brand & Historic Statement */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="flex items-center gap-2">
-              <img 
-                src="/obpc-logo-white.svg" 
-                alt="Igreja O Brasil Para Cristo" 
-                className="h-12 sm:h-14 w-auto object-contain"
-              />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#70b83b]/20 flex items-center justify-center text-[#70b83b] border border-[#70b83b]/40">
+                <Church className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="font-serif font-bold text-white text-base tracking-wide block uppercase">
+                  {churchInfo.name || 'O Brasil Para Cristo'}
+                </span>
+                <span className="text-[11px] text-slate-400 uppercase tracking-widest block">
+                  {churchInfo.cityState || 'Rio Largo - AL'}
+                </span>
+              </div>
             </div>
 
             <p className="text-xs text-slate-300 leading-relaxed max-w-md">
@@ -76,10 +78,14 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdminLogin, onNavigate }) 
                 NOSSOS DEPARTAMENTOS
               </h4>
               <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold text-slate-300">
-                <span className="px-2.5 py-1 bg-slate-800 rounded border border-slate-700">JUBRAC (Jovens)</span>
-                <span className="px-2.5 py-1 bg-slate-800 rounded border border-slate-700">UFEBRAC (Mulheres)</span>
-                <span className="px-2.5 py-1 bg-slate-800 rounded border border-slate-700">MENBRAC (Homens)</span>
-                <span className="px-2.5 py-1 bg-slate-800 rounded border border-slate-700">UCEBRAC (Crianças)</span>
+                {departments.filter(d => d.isActive).map((dept) => (
+                  <span 
+                    key={dept.id} 
+                    className="px-2.5 py-1 bg-slate-800 rounded border border-slate-700 hover:border-amber-400 hover:text-white transition-colors"
+                  >
+                    {dept.name}
+                  </span>
+                ))}
               </div>
             </div>
 
