@@ -170,9 +170,17 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdminLogin, onNavigate }) 
             © {new Date().getFullYear()} Igreja Evangélica Pentecostal O Brasil Para Cristo. Todos os direitos reservados.
           </p>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <span className="text-[11px] text-slate-400">
-              Desperta Brasil!
+              Desenvolvido por{' '}
+              <a
+                href="https://maximosistemas.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-400 hover:text-amber-300 font-semibold underline underline-offset-2 transition-colors"
+              >
+                maximosistemas.com
+              </a>
             </span>
             {/* Green Square Back-to-Top Button (Template Style) */}
             <button
