@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS church_info (
   id TEXT PRIMARY KEY DEFAULT 'main',
   name TEXT NOT NULL DEFAULT 'Igreja O Brasil Para Cristo',
   subtitle TEXT DEFAULT 'Uma Família que Ama a Deus, Serve ao Próximo e Vive a Palavra',
-  pastor_name TEXT DEFAULT 'Pr. Carlos Eduardo e Pra. Marlene Ramos',
+  pastor_name TEXT DEFAULT 'Pr. Janildo Manoel',
   vice_pastor_name TEXT DEFAULT 'Pr. Marcos Vinicius',
   address TEXT DEFAULT 'Av. das Nações Unidas, 1420 - Bairro Central',
   city_state TEXT DEFAULT 'São Paulo - SP',
@@ -743,7 +743,11 @@ export const supabaseService = {
         mediaItems: itemsRes.data ? itemsRes.data.map(toMediaItem) : null,
         prayerRequests: prayersRes.data ? prayersRes.data.map(toPrayerRequest) : null,
         members: membersRes.data ? membersRes.data.map(toMember) : null,
-        transactions: txRes.data ? txRes.data.map(toTransaction) : null,
+        transactions: txRes.data
+          ? txRes.data
+              .map(toTransaction)
+              .filter(t => !/^tx-([1-9]|1[0-1])$/.test(t.id) && !/^REC-2026-080[1-6]$/.test(t.receiptNumber) && !/^DESP-2026-080[1-5]$/.test(t.receiptNumber))
+          : null,
         users: usersRes.data ? usersRes.data.map(toSystemUser) : null,
         logs: logsRes.data ? logsRes.data.map(toAuditLog) : null
       };
@@ -940,6 +944,12 @@ export const supabaseService = {
     const client = getSupabase();
     if (!client) return;
     await client.from('financial_transactions').delete().eq('id', id);
+  },
+
+  async clearAllTransactions() {
+    const client = getSupabase();
+    if (!client) return;
+    await client.from('financial_transactions').delete().neq('id', '___none___');
   },
 
   // Usuários e Senhas no Supabase

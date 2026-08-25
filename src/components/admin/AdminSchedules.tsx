@@ -25,7 +25,7 @@ export const AdminSchedules: React.FC = () => {
   const [title, setTitle] = useState('');
   const [ministry, setMinistry] = useState('');
   const [description, setDescription] = useState('');
-  const [leader, setLeader] = useState('Pr. Carlos Eduardo');
+  const [leader, setLeader] = useState('Pr. Janildo Manoel');
   const [location, setLocation] = useState('Templo Sede');
   const [iconName, setIconName] = useState('heart-handshake');
 
@@ -36,7 +36,7 @@ export const AdminSchedules: React.FC = () => {
     setTitle('');
     setMinistry('Ministério Geral');
     setDescription('');
-    setLeader('Pr. Carlos Eduardo');
+    setLeader('Pr. Janildo Manoel');
     setLocation('Templo Sede');
     setIconName('heart-handshake');
     setIsModalOpen(true);
@@ -238,7 +238,7 @@ export const AdminSchedules: React.FC = () => {
                     type="text"
                     value={leader}
                     onChange={(e) => setLeader(e.target.value)}
-                    placeholder="Ex: Pr. Carlos Eduardo"
+                    placeholder="Ex: Pr. Janildo Manoel"
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-400"
                   />
                 </div>

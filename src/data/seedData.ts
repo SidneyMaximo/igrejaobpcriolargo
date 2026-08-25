@@ -14,7 +14,7 @@ import {
 export const INITIAL_CHURCH_INFO: ChurchInfo = {
   name: 'Igreja O Brasil Para Cristo',
   subtitle: 'Uma Família que Ama a Deus, Serve ao Próximo e Vive a Palavra',
-  pastorName: 'Pr. Carlos Eduardo e Pra. Marlene Ramos',
+  pastorName: 'Pr. Janildo Manoel',
   vicePastorName: 'Pr. Marcos Vinicius',
   address: 'Av. das Nações Unidas, 1420 - Bairro Central',
   cityState: 'São Paulo - SP',
@@ -192,7 +192,7 @@ export const INITIAL_EVENTS: ChurchEvent[] = [
     highlight: false,
     registrationOpen: false,
     registeredCount: 0,
-    guestSpeaker: 'Pr. Carlos Eduardo & Evangelistas'
+    guestSpeaker: 'Pr. Janildo Manoel & Evangelistas'
   },
   {
     id: 'evt-4',
@@ -438,163 +438,7 @@ export const INITIAL_MEMBERS: ChurchMember[] = [
   }
 ];
 
-export const INITIAL_TRANSACTIONS: FinancialTransaction[] = [
-  {
-    id: 'tx-1',
-    receiptNumber: 'REC-2026-0801',
-    type: 'entrada',
-    category: 'Dízimo',
-    amount: 1450.00,
-    date: '2026-08-05',
-    description: 'Devolução de Dízimo Sagrado - Mês Agosto',
-    paymentMethod: 'PIX',
-    memberId: 'mbr-1',
-    memberSigiloCode: 'MBR-2024-001',
-    memberNameCached: 'Sebastião Alves Moreira',
-    isStrictConfidential: true,
-    registeredBy: 'Tesoureiro Geral',
-    createdAt: '2026-08-05 10:15'
-  },
-  {
-    id: 'tx-2',
-    receiptNumber: 'REC-2026-0802',
-    type: 'entrada',
-    category: 'Dízimo',
-    amount: 820.00,
-    date: '2026-08-06',
-    description: 'Devolução de Dízimo Sagrado',
-    paymentMethod: 'Transferência Bancária',
-    memberId: 'mbr-2',
-    memberSigiloCode: 'MBR-2024-015',
-    memberNameCached: 'Claudia Helena Siqueira',
-    isStrictConfidential: true,
-    registeredBy: 'Tesoureiro Geral',
-    createdAt: '2026-08-06 14:40'
-  },
-  {
-    id: 'tx-3',
-    receiptNumber: 'REC-2026-0803',
-    type: 'entrada',
-    category: 'Oferta de Culto',
-    amount: 3240.50,
-    date: '2026-08-09',
-    description: 'Ofertas recolhidas no Culto da Família de Domingo (Gazofilácio e PIX da igreja)',
-    paymentMethod: 'Dinheiro',
-    isStrictConfidential: false,
-    registeredBy: 'Equipe de Tesouraria',
-    createdAt: '2026-08-09 21:10'
-  },
-  {
-    id: 'tx-4',
-    receiptNumber: 'REC-2026-0804',
-    type: 'entrada',
-    category: 'Dízimo',
-    amount: 2100.00,
-    date: '2026-08-10',
-    description: 'Dízimo Sigiloso Registrado via PIX',
-    paymentMethod: 'PIX',
-    memberId: 'mbr-3',
-    memberSigiloCode: 'MBR-2025-088',
-    memberNameCached: 'Marcos Antonio de Oliveira',
-    isStrictConfidential: true,
-    registeredBy: 'Tesoureiro Geral',
-    createdAt: '2026-08-10 09:30'
-  },
-  {
-    id: 'tx-5',
-    receiptNumber: 'REC-2026-0805',
-    type: 'entrada',
-    category: 'Oferta Missionária',
-    amount: 1580.00,
-    date: '2026-08-16',
-    description: 'Oferta especial de Missões recolhida no 3º Domingo do mês',
-    paymentMethod: 'PIX',
-    isStrictConfidential: false,
-    registeredBy: 'Secretaria de Missões',
-    createdAt: '2026-08-16 20:45'
-  },
-  {
-    id: 'tx-6',
-    receiptNumber: 'REC-2026-0806',
-    type: 'entrada',
-    category: 'Campanha / Construção',
-    amount: 5000.00,
-    date: '2026-08-18',
-    description: 'Oferta de voto para reforma do piso e isolamento acústico do templo',
-    paymentMethod: 'Transferência Bancária',
-    memberId: 'mbr-5',
-    memberSigiloCode: 'MBR-2026-140',
-    memberNameCached: 'Família Souza',
-    isStrictConfidential: true,
-    registeredBy: 'Tesoureiro Geral',
-    createdAt: '2026-08-18 11:20'
-  },
-  {
-    id: 'tx-7',
-    receiptNumber: 'DESP-2026-0801',
-    type: 'saida',
-    category: 'Contas de Consumo (Água/Luz/Net)',
-    amount: 1420.30,
-    date: '2026-08-10',
-    description: 'Pagamento conta de energia elétrica ENEL (Templo Sede e salas de aula)',
-    paymentMethod: 'Boleto',
-    isStrictConfidential: false,
-    registeredBy: 'Tesoureiro Geral',
-    createdAt: '2026-08-10 15:00'
-  },
-  {
-    id: 'tx-8',
-    receiptNumber: 'DESP-2026-0802',
-    type: 'saida',
-    category: 'Contas de Consumo (Água/Luz/Net)',
-    amount: 380.50,
-    date: '2026-08-12',
-    description: 'Pagamento SABESP Água e Esgoto referente a Julho/Agosto',
-    paymentMethod: 'Boleto',
-    isStrictConfidential: false,
-    registeredBy: 'Tesoureiro Geral',
-    createdAt: '2026-08-12 10:00'
-  },
-  {
-    id: 'tx-9',
-    receiptNumber: 'DESP-2026-0803',
-    type: 'saida',
-    category: 'Missões e Ação Social',
-    amount: 2500.00,
-    date: '2026-08-15',
-    description: 'Sustento missionário mensal para campos no Sertão Nordestino e Moçambique + Sopão Comunitário',
-    paymentMethod: 'PIX',
-    isStrictConfidential: false,
-    registeredBy: 'Tesoureiro Geral',
-    createdAt: '2026-08-15 09:00'
-  },
-  {
-    id: 'tx-10',
-    receiptNumber: 'DESP-2026-0804',
-    type: 'saida',
-    category: 'Manutenção e Conservação',
-    amount: 890.00,
-    date: '2026-08-17',
-    description: 'Conserto e higienização dos aparelhos de ar-condicionado do santuário',
-    paymentMethod: 'PIX',
-    isStrictConfidential: false,
-    registeredBy: 'Tesoureiro Geral',
-    createdAt: '2026-08-17 16:30'
-  },
-  {
-    id: 'tx-11',
-    receiptNumber: 'DESP-2026-0805',
-    type: 'saida',
-    category: 'Material Eclesiástico / Ceia',
-    amount: 450.00,
-    date: '2026-08-01',
-    description: 'Compra de cálices descartáveis, pães para Ceia e materiais de EBD infantil',
-    paymentMethod: 'Cartão',
-    isStrictConfidential: false,
-    registeredBy: 'Secretaria',
-    createdAt: '2026-08-01 11:15'
-  }
-];
+export const INITIAL_TRANSACTIONS: FinancialTransaction[] = [];
 
 export const DAILY_VERSES = [
   {
@@ -622,55 +466,16 @@ export const DAILY_VERSES = [
 export const INITIAL_SYSTEM_USERS: SystemUser[] = [
   {
     id: 'usr-1',
-    name: 'Pr. Carlos Eduardo',
+    name: 'Pr. Janildo Manoel',
     username: 'pastor',
     password: '1234', // default demo PIN / password
     role: 'pastor',
-    email: 'pastor.carlos@obrasilparacristo.org.br',
+    email: 'pastor.janildo@obrasilparacristo.org.br',
     phone: '(11) 99876-5432',
     isActive: true,
     createdAt: '2026-01-10',
     lastLogin: '2026-08-24 15:30',
     createdBy: 'Sistema'
-  },
-  {
-    id: 'usr-2',
-    name: 'Tesoureiro Geral',
-    username: 'tesouraria',
-    password: '1234',
-    role: 'tesoureiro',
-    email: 'tesouraria@obrasilparacristo.org.br',
-    phone: '(11) 98765-4321',
-    isActive: true,
-    createdAt: '2026-01-15',
-    lastLogin: '2026-08-24 14:10',
-    createdBy: 'Pr. Carlos Eduardo'
-  },
-  {
-    id: 'usr-3',
-    name: 'Secretaria Eclesiástica & Mídia',
-    username: 'secretaria',
-    password: '1234',
-    role: 'secretaria',
-    email: 'secretaria@obrasilparacristo.org.br',
-    phone: '(11) 3214-8800',
-    isActive: true,
-    createdAt: '2026-02-01',
-    lastLogin: '2026-08-23 18:45',
-    createdBy: 'Pr. Carlos Eduardo'
-  },
-  {
-    id: 'usr-4',
-    name: 'Liderança de Ministério (ADOBRAC / UFEBRAC)',
-    username: 'lideranca',
-    password: '1234',
-    role: 'lider',
-    email: 'lideranca@obrasilparacristo.org.br',
-    phone: '(11) 97654-3210',
-    isActive: true,
-    createdAt: '2026-03-01',
-    lastLogin: '2026-08-20 19:15',
-    createdBy: 'Pr. Carlos Eduardo'
   }
 ];
 
@@ -678,7 +483,7 @@ export const INITIAL_AUDIT_LOGS: AuditLog[] = [
   {
     id: 'log-1',
     timestamp: '24/08/2026 15:30:12',
-    userName: 'Pr. Carlos Eduardo',
+    userName: 'Pr. Janildo Manoel',
     userRole: 'pastor',
     action: 'Login no Sistema',
     category: 'AUTH',
@@ -689,8 +494,8 @@ export const INITIAL_AUDIT_LOGS: AuditLog[] = [
   {
     id: 'log-2',
     timestamp: '24/08/2026 14:22:45',
-    userName: 'Tesoureiro Geral',
-    userRole: 'tesoureiro',
+    userName: 'Pr. Janildo Manoel',
+    userRole: 'pastor',
     action: 'Lançamento de Dízimo',
     category: 'FINANCEIRO',
     details: 'Registrado dízimo de R$ 750,00 para o membro MBR-2026-102 (Recibo REC-2026-3021).',
@@ -700,8 +505,8 @@ export const INITIAL_AUDIT_LOGS: AuditLog[] = [
   {
     id: 'log-3',
     timestamp: '24/08/2026 11:15:30',
-    userName: 'Secretaria & Mídia',
-    userRole: 'secretaria',
+    userName: 'Pr. Janildo Manoel',
+    userRole: 'pastor',
     action: 'Atualização de Horários de Cultos',
     category: 'CULTOS',
     details: 'Atualizada a programação do Círculo de Oração Forene de Segunda-feira.',
@@ -711,7 +516,7 @@ export const INITIAL_AUDIT_LOGS: AuditLog[] = [
   {
     id: 'log-4',
     timestamp: '23/08/2026 20:45:10',
-    userName: 'Pr. Carlos Eduardo',
+    userName: 'Pr. Janildo Manoel',
     userRole: 'pastor',
     action: 'Atendimento de Pedido de Oração',
     category: 'ORACAO',
@@ -722,8 +527,8 @@ export const INITIAL_AUDIT_LOGS: AuditLog[] = [
   {
     id: 'log-5',
     timestamp: '23/08/2026 16:30:00',
-    userName: 'Secretaria & Mídia',
-    userRole: 'secretaria',
+    userName: 'Pr. Janildo Manoel',
+    userRole: 'pastor',
     action: 'Novo Evento Publicado',
     category: 'EVENTOS',
     details: 'Publicado evento "Vigília das 12 Horas de Clamor" para 20/09/2026.',

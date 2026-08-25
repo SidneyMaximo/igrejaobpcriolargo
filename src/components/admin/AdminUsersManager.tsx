@@ -423,7 +423,7 @@ export const AdminUsersManager: React.FC = () => {
                   <input
                     type="text"
                     required
-                    placeholder="Ex: Pr. Carlos Eduardo"
+                    placeholder="Ex: Pr. Janildo Manoel"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-400"

@@ -96,6 +96,7 @@ interface ChurchContextType {
   addTransaction: (tx: Omit<FinancialTransaction, 'id' | 'receiptNumber' | 'createdAt'>) => FinancialTransaction;
   updateTransaction: (id: string, tx: Partial<FinancialTransaction>) => void;
   deleteTransaction: (id: string) => void;
+  clearAllTransactions: () => Promise<void>;
   financialSummary: FinancialSummary;
 
   // System Users & Security
@@ -144,11 +145,11 @@ const STORAGE_KEYS = {
   MEDIA: 'obpc_media_items_v1',
   PRAYERS: 'obpc_prayers_v1',
   MEMBERS: 'obpc_members_v1',
-  TRANSACTIONS: 'obpc_transactions_v1',
+  TRANSACTIONS: 'obpc_transactions_v2',
   ADMIN: 'obpc_admin_session_v1',
   SIGILO: 'obpc_sigilo_mode_v1',
-  USERS: 'obpc_system_users_v1',
-  LOGS: 'obpc_audit_logs_v1'
+  USERS: 'obpc_system_users_v2',
+  LOGS: 'obpc_audit_logs_v2'
 };
 
 const safeParse = <T,>(key: string, fallback: T): T => {
@@ -353,7 +354,10 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         if (data.mediaItems && data.mediaItems.length > 0) setMediaItems(data.mediaItems);
         if (data.prayerRequests && data.prayerRequests.length > 0) setPrayerRequests(data.prayerRequests);
         if (data.members && data.members.length > 0) setMembers(data.members);
-        if (data.transactions && data.transactions.length > 0) setTransactions(data.transactions);
+        if (data.transactions) {
+          const cleanTx = data.transactions.filter(t => !/^tx-([1-9]|1[0-1])$/.test(t.id) && !/^REC-2026-080[1-6]$/.test(t.receiptNumber) && !/^DESP-2026-080[1-5]$/.test(t.receiptNumber));
+          setTransactions(cleanTx);
+        }
         if (data.users && data.users.length > 0) setUsers(data.users);
         if (data.logs && data.logs.length > 0) setAuditLogs(data.logs);
       } else {
@@ -495,6 +499,18 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setSupabaseStatusMessage('Modo Local Ativo. Configure o Supabase para sincronização em nuvem.');
       }
     };
+
+    // Auto-clean legacy dummy transactions from local storage/state on boot
+    setTransactions(prev => {
+      const filtered = prev.filter(t => !/^tx-([1-9]|1[0-1])$/.test(t.id) && !/^REC-2026-080[1-6]$/.test(t.receiptNumber) && !/^DESP-2026-080[1-5]$/.test(t.receiptNumber));
+      if (filtered.length !== prev.length) {
+        localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify(filtered));
+      }
+      return filtered;
+    });
+    try {
+      localStorage.removeItem('obpc_transactions_v1');
+    } catch (e) {}
 
     initializeSupabase();
   }, []);
@@ -812,6 +828,16 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     );
   };
 
+  const clearAllTransactions = async () => {
+    setTransactions([]);
+    localStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify([]));
+    try {
+      localStorage.removeItem('obpc_transactions_v1');
+    } catch (e) {}
+    await supabaseService.clearAllTransactions();
+    addAuditLog('Livro Caixa Zerado', 'FINANCEIRO', 'Todas as entradas e saídas foram limpas do sistema.', 'aviso');
+  };
+
   // Financial summary computation
   const financialSummary: FinancialSummary = React.useMemo(() => {
     let totalEntradas = 0;
@@ -976,21 +1002,13 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return true;
     }
 
-    // 3. Fallback master pins / quick demo logins
+    // 3. Fallback master pins / pastor login
     const cleanLower = cleanInput.toLowerCase();
-    const validMasterCodes = ['1234', 'obpc2026', 'pastor', 'admin', 'lideranca', 'tesouraria', 'obpc'];
+    const validMasterCodes = ['1234', 'obpc2026', 'pastor', 'admin', 'obpc'];
     
     if (validMasterCodes.includes(cleanLower) || cleanInput.length >= 4) {
-      let roleDetermined: RoleType = role;
-      let name = customName || 'Pastor Carlos Eduardo';
-
-      if (cleanLower === 'tesouraria') {
-        roleDetermined = 'tesoureiro';
-        name = 'Tesouraria Eclesiástica';
-      } else if (cleanLower === 'secretaria' || cleanLower === 'midia') {
-        roleDetermined = 'secretaria';
-        name = 'Secretaria & Mídia';
-      }
+      const roleDetermined: RoleType = role;
+      const name = customName || 'Pastor Janildo Manoel';
 
       const session: AdminSession = {
         isAuthenticated: true,
@@ -999,7 +1017,7 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         loginTime: new Date().toLocaleString('pt-BR')
       };
       setAdminSession(session);
-      addAuditLog('Login no Sistema', 'AUTH', `Acesso administrativo via PIN Master (${name} - ${roleDetermined}).`);
+      addAuditLog('Login no Sistema', 'AUTH', `Acesso administrativo (${name} - ${roleDetermined}).`);
       return true;
     }
 
@@ -1114,6 +1132,7 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         addTransaction,
         updateTransaction,
         deleteTransaction,
+        clearAllTransactions,
         financialSummary,
         users,
         addUser,

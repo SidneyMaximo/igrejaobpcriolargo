@@ -257,7 +257,7 @@ export const AssemblyReportModal: React.FC<AssemblyReportModalProps> = ({ onClos
             <div className="grid grid-cols-3 gap-6 text-center text-xs text-slate-800">
               <div>
                 <div className="border-b border-slate-400 pb-1 mb-1">
-                  <strong className="block text-[11px] font-bold">Pr. Carlos Eduardo</strong>
+                  <strong className="block text-[11px] font-bold">Pr. Janildo Manoel</strong>
                 </div>
                 <span className="text-[10px] text-slate-500">Pastor Presidente</span>
               </div>

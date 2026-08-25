@@ -38,6 +38,7 @@ export const AdminFinancialCRM: React.FC = () => {
     setSigiloModeActive, 
     addTransaction, 
     deleteTransaction,
+    clearAllTransactions,
     addMember,
     updateMember,
     deleteMember,
@@ -293,6 +294,20 @@ export const AdminFinancialCRM: React.FC = () => {
             <Plus className="w-3.5 h-3.5" />
             <span>+ Despesa / Saída</span>
           </button>
+          {transactions.length > 0 && activeSubTab === 'livro_caixa' && (
+            <button
+              onClick={async () => {
+                if (window.confirm('Atenção: Deseja realmente zerar o Livro Caixa e apagar todas as entradas e saídas de teste?')) {
+                  await clearAllTransactions();
+                }
+              }}
+              className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-rose-900/50 text-slate-300 hover:text-rose-300 border border-slate-700 font-bold text-xs px-3.5 py-2 rounded-xl transition-all"
+              title="Excluir todas as transações e zerar o saldo"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+              <span>Zerar Livro Caixa</span>
+            </button>
+          )}
           {activeSubTab === 'membros' && (
             <button
               onClick={() => setIsMemberModalOpen(true)}

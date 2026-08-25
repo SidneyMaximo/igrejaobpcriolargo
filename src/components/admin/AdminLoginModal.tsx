@@ -262,7 +262,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
           {/* Quick preset login for fast testing */}
           <div className="pt-3 border-t border-slate-800">
             <span className="text-[11px] text-slate-400 block mb-2 font-medium text-center">
-              Contas Rápidas Cadastradas:
+              Acesso Rápido do Pastor:
             </span>
             <div className="flex flex-wrap items-center justify-center gap-1.5">
               <button
@@ -270,21 +270,7 @@ export const AdminLoginModal: React.FC<AdminLoginModalProps> = ({
                 onClick={() => fillQuickUser('pastor', '1234')}
                 className="text-[10px] bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-amber-300 px-2.5 py-1 rounded-md border border-slate-700 transition-colors"
               >
-                Pr. Carlos (@pastor)
-              </button>
-              <button
-                type="button"
-                onClick={() => fillQuickUser('tesouraria', '1234')}
-                className="text-[10px] bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-amber-300 px-2.5 py-1 rounded-md border border-slate-700 transition-colors"
-              >
-                Tesouraria (@tesouraria)
-              </button>
-              <button
-                type="button"
-                onClick={() => fillQuickUser('secretaria', '1234')}
-                className="text-[10px] bg-slate-800 hover:bg-slate-750 text-slate-300 hover:text-amber-300 px-2.5 py-1 rounded-md border border-slate-700 transition-colors"
-              >
-                Secretaria (@secretaria)
+                Pr. Janildo (@pastor)
               </button>
             </div>
           </div>
