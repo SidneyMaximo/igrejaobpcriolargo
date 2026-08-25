@@ -1,27 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Database, 
   Check, 
   Copy, 
   Download, 
   RefreshCw, 
-  ShieldCheck, 
   AlertCircle, 
-  ExternalLink,
-  Sparkles,
-  Terminal,
-  Key,
-  Globe,
-  UploadCloud,
-  DownloadCloud,
-  CheckCircle2,
-  XCircle,
-  HelpCircle,
-  Eye,
-  EyeOff,
-  Trash2
+  Terminal, 
+  UploadCloud, 
+  DownloadCloud, 
+  CheckCircle2 
 } from 'lucide-react';
-import { SUPABASE_SCHEMA_SQL, getSupabaseCredentials } from '../../lib/supabase';
+import { SUPABASE_SCHEMA_SQL } from '../../lib/supabase';
 import { useChurch } from '../../context/ChurchContext';
 
 export const AdminSupabaseSettings: React.FC = () => {
@@ -40,18 +30,10 @@ export const AdminSupabaseSettings: React.FC = () => {
     isSyncing,
     syncToSupabase,
     syncFromSupabase,
-    saveCredentials,
-    clearCredentials,
     checkSupabaseHealth
   } = useChurch();
 
   const [copied, setCopied] = useState(false);
-  const [showKey, setShowKey] = useState(false);
-  
-  // Credentials state
-  const creds = getSupabaseCredentials();
-  const [supabaseUrlInput, setSupabaseUrlInput] = useState(creds.url);
-  const [supabaseKeyInput, setSupabaseKeyInput] = useState(creds.key);
   const [feedbackMsg, setFeedbackMsg] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [testingConnection, setTestingConnection] = useState(false);
 
@@ -60,7 +42,7 @@ export const AdminSupabaseSettings: React.FC = () => {
   const [subtitle, setSubtitle] = useState(churchInfo.subtitle);
   const [address, setAddress] = useState(churchInfo.address);
   const [cityState, setCityState] = useState(churchInfo.cityState);
-  const [zipCode, setZipCode] = useState(churchInfo.zipCode || '01310-200');
+  const [zipCode, setZipCode] = useState(churchInfo.zipCode || '57100-000');
   const [phone, setPhone] = useState(churchInfo.phone);
   const [whatsapp, setWhatsapp] = useState(churchInfo.whatsapp);
   const [email, setEmail] = useState(churchInfo.email);
@@ -77,34 +59,10 @@ export const AdminSupabaseSettings: React.FC = () => {
   const [historyText, setHistoryText] = useState(churchInfo.historyText || '');
   const [isSaved, setIsSaved] = useState(false);
 
-  useEffect(() => {
-    const current = getSupabaseCredentials();
-    setSupabaseUrlInput(current.url);
-    setSupabaseKeyInput(current.key);
-  }, [supabaseStatus]);
-
   const handleCopySql = () => {
     navigator.clipboard.writeText(SUPABASE_SCHEMA_SQL);
     setCopied(true);
     setTimeout(() => setCopied(false), 3000);
-  };
-
-  const handleSaveSupabaseConfig = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!supabaseUrlInput || !supabaseKeyInput) {
-      setFeedbackMsg({ type: 'error', text: 'Preencha a URL e a Anon Key do Supabase.' });
-      return;
-    }
-
-    setTestingConnection(true);
-    const result = await saveCredentials(supabaseUrlInput, supabaseKeyInput);
-    setTestingConnection(false);
-
-    if (result.success) {
-      setFeedbackMsg({ type: 'success', text: 'Supabase configurado e conectado com sucesso!' });
-    } else {
-      setFeedbackMsg({ type: 'error', text: result.message });
-    }
   };
 
   const handleTestConnection = async () => {
@@ -113,7 +71,7 @@ export const AdminSupabaseSettings: React.FC = () => {
     setTestingConnection(false);
 
     if (result.success) {
-      setFeedbackMsg({ type: 'success', text: 'Conexão testada com sucesso! Supabase PostgreSQL está respondendo.' });
+      setFeedbackMsg({ type: 'success', text: 'Conexão testada com sucesso! Supabase PostgreSQL está respondendo normalmente.' });
     } else {
       setFeedbackMsg({ type: 'error', text: result.message });
     }
@@ -140,15 +98,6 @@ export const AdminSupabaseSettings: React.FC = () => {
       setFeedbackMsg({ type: 'success', text: 'Dados baixados e sincronizados com sucesso!' });
     } else {
       setFeedbackMsg({ type: 'error', text: res.message });
-    }
-  };
-
-  const handleDisconnect = () => {
-    if (window.confirm('Deseja desconectar o Supabase? O sistema voltará ao modo LocalStorage offline.')) {
-      clearCredentials();
-      setSupabaseUrlInput('');
-      setSupabaseKeyInput('');
-      setFeedbackMsg({ type: 'info', text: 'Supabase desconectado. O sistema está em modo LocalStorage.' });
     }
   };
 
@@ -227,8 +176,8 @@ export const AdminSupabaseSettings: React.FC = () => {
         </div>
       </div>
 
-      {/* Supabase Status & Config Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow">
+      {/* Supabase Status & Sync Card */}
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow space-y-6">
         
         {/* Status Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
@@ -272,32 +221,21 @@ export const AdminSupabaseSettings: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
             <button
               onClick={handleTestConnection}
               disabled={testingConnection}
-              className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 transition-all disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-700 transition-all disabled:opacity-50 shadow"
             >
               <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${testingConnection ? 'animate-spin' : ''}`} />
               <span>Testar Conexão</span>
             </button>
-
-            {supabaseStatus === 'connected' && (
-              <button
-                onClick={handleDisconnect}
-                className="inline-flex items-center gap-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 px-3 py-1.5 rounded-lg text-xs font-semibold border border-rose-500/30 transition-all"
-                title="Desconectar Supabase"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>Desconectar</span>
-              </button>
-            )}
           </div>
         </div>
 
         {/* Feedback Alert */}
         {feedbackMsg && (
-          <div className={`mt-4 p-3 rounded-xl text-xs flex items-center gap-2 border ${
+          <div className={`p-3 rounded-xl text-xs flex items-center gap-2 border ${
             feedbackMsg.type === 'success' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' :
             feedbackMsg.type === 'error' ? 'bg-rose-500/10 text-rose-300 border-rose-500/30' :
             'bg-sky-500/10 text-sky-300 border-sky-500/30'
@@ -307,72 +245,8 @@ export const AdminSupabaseSettings: React.FC = () => {
           </div>
         )}
 
-        {/* Supabase Credentials Form */}
-        <form onSubmit={handleSaveSupabaseConfig} className="mt-5 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center gap-1.5">
-                <Globe className="w-3.5 h-3.5 text-amber-400" />
-                <span>Supabase Project URL</span>
-              </label>
-              <input
-                type="url"
-                placeholder="https://exemplo.supabase.co"
-                value={supabaseUrlInput}
-                onChange={(e) => setSupabaseUrlInput(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-400"
-              />
-              <span className="text-[10px] text-slate-500 mt-1 block">
-                Encontrado em: <em>Supabase Dashboard &gt; Project Settings &gt; API &gt; Project URL</em>
-              </span>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5 flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <Key className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Supabase anon Public Key</span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setShowKey(!showKey)}
-                  className="text-[11px] text-slate-400 hover:text-amber-400 flex items-center gap-1"
-                >
-                  {showKey ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                  <span>{showKey ? 'Ocultar' : 'Visualizar'}</span>
-                </button>
-              </label>
-              <input
-                type={showKey ? 'text' : 'password'}
-                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                value={supabaseKeyInput}
-                onChange={(e) => setSupabaseKeyInput(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-400"
-              />
-              <span className="text-[10px] text-slate-500 mt-1 block">
-                Encontrado em: <em>Supabase Dashboard &gt; Project Settings &gt; API &gt; Project API keys (anon public)</em>
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-            <div className="text-[11px] text-slate-400">
-              💡 As credenciais salvas aqui conectam o sistema instantaneamente sem precisar reiniciar o servidor.
-            </div>
-
-            <button
-              type="submit"
-              disabled={testingConnection}
-              className="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow transition-all flex items-center gap-2 disabled:opacity-50"
-            >
-              {testingConnection ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <ShieldCheck className="w-3.5 h-3.5" />}
-              <span>Salvar e Conectar Supabase</span>
-            </button>
-          </div>
-        </form>
-
-        {/* Sync Controls if connected */}
-        <div className="mt-6 pt-5 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Sincronização Push / Pull */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between">
             <div>
               <h5 className="text-xs font-bold text-white flex items-center gap-2">
@@ -380,7 +254,7 @@ export const AdminSupabaseSettings: React.FC = () => {
                 <span>Enviar Dados Locais para o Supabase (Push)</span>
               </h5>
               <p className="text-[11px] text-slate-400 mt-1">
-                Envia todos os cultos, eventos, membros, fotos e financeiro locais para popular o Supabase pela primeira vez.
+                Envia todos os cultos, eventos, membros, fotos e financeiro locais para sincronizar com o Supabase.
               </p>
             </div>
             <button
@@ -414,50 +288,16 @@ export const AdminSupabaseSettings: React.FC = () => {
           </div>
         </div>
 
-        {/* Step-by-Step Instructions */}
-        <div className="mt-6 pt-5 border-t border-slate-800">
-          <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <HelpCircle className="w-4 h-4" />
-            <span>Passo a Passo para Configurar o Supabase</span>
-          </h5>
-
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs text-slate-300">
-            <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
-              <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-xs mb-2">1</span>
-              <p className="font-semibold text-white">Criar Projeto</p>
-              <p className="text-[11px] text-slate-400 mt-1">Acesse <a href="https://supabase.com" target="_blank" rel="noreferrer" className="text-amber-400 underline">supabase.com</a> e crie um projeto gratuito.</p>
-            </div>
-
-            <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
-              <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-xs mb-2">2</span>
-              <p className="font-semibold text-white">SQL Editor</p>
-              <p className="text-[11px] text-slate-400 mt-1">No menu lateral esquerdo, clique no ícone <strong>SQL Editor</strong> e crie uma <em>New Query</em>.</p>
-            </div>
-
-            <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
-              <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-xs mb-2">3</span>
-              <p className="font-semibold text-white">Executar Script</p>
-              <p className="text-[11px] text-slate-400 mt-1">Copie o script SQL abaixo, cole na query e clique no botão verde <strong>RUN</strong>.</p>
-            </div>
-
-            <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
-              <span className="w-6 h-6 rounded-full bg-amber-500/20 text-amber-400 font-bold flex items-center justify-center text-xs mb-2">4</span>
-              <p className="font-semibold text-white">Copiar Chaves API</p>
-              <p className="text-[11px] text-slate-400 mt-1">Vá em <em>Settings &gt; API</em>, copie a <strong>URL</strong> e a <strong>anon key</strong> e cole no formulário acima.</p>
-            </div>
-          </div>
-        </div>
-
         {/* SQL Script Viewer */}
-        <div className="mt-6 space-y-3">
-          <div className="flex items-center justify-between">
+        <div className="pt-4 border-t border-slate-800 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
               <Terminal className="w-4 h-4 text-amber-400" />
-              <span>Script SQL Oficial com Tabelas, RLS e Realtime (Copie e Cole no Supabase)</span>
+              <span>Script SQL de Estrutura do Banco (Tabelas, RLS e Realtime)</span>
             </div>
             <button
               onClick={handleCopySql}
-              className="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shadow"
+              className="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow self-start sm:self-auto"
             >
               {copied ? (
                 <>
@@ -467,13 +307,13 @@ export const AdminSupabaseSettings: React.FC = () => {
               ) : (
                 <>
                   <Copy className="w-3.5 h-3.5" />
-                  <span>Copiar Script SQL Oficial</span>
+                  <span>Copiar Script SQL</span>
                 </>
               )}
             </button>
           </div>
 
-          <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 max-h-56 overflow-y-auto font-mono text-[11px] text-slate-300">
+          <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 max-h-48 overflow-y-auto font-mono text-[11px] text-slate-300">
             <pre>{SUPABASE_SCHEMA_SQL}</pre>
           </div>
         </div>
