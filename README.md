@@ -148,22 +148,24 @@ Acesse no navegador: `http://localhost:3000`
 
 ## 🗄️ Banco de Dados & Supabase
 
-O sistema utiliza PostgreSQL no Supabase com suporte a Realtime. As principais tabelas são:
+O sistema utiliza PostgreSQL no Supabase com suporte a Realtime. As 12 tabelas oficiais são:
 
 | Tabela | Descrição |
 | :--- | :--- |
 | `church_info` | Dados institucionais, endereço, pastor titular e chaves PIX |
-| `church_schedules` | Horários e detalhes da programação semanal de cultos |
-| `church_events` | Eventos, conferências, congressos e inscrições |
+| `weekly_schedules` | Horários e detalhes da programação semanal de cultos |
+| `church_events` | Eventos, conferências, congressos e programações especiais |
+| `event_registrations` | Inscrições de fiéis nos eventos e conferências da igreja |
+| `church_departments` | Gestão de Departamentos & Ministérios (JUBRAC, UFEBRAC, MENBRAC, UCEBRAC, ADOBRAC, Louvor) |
 | `media_folders` | Pastas de categorização de álbuns de fotos e vídeos |
-| `media_items` | Links e embeds de fotos e vídeos da galeria |
+| `media_items` | Links e fotos/vídeos da galeria da igreja |
 | `prayer_requests` | Pedidos de oração públicos e confidenciais |
 | `church_members` | Ficha cadastral e código sigiloso dos membros |
 | `financial_transactions`| Livro Caixa: Dízimos, ofertas, entradas e despesas |
 | `system_users` | Usuários administrativos e níveis de permissão |
 | `audit_logs` | Trilha de auditoria e registro de operações críticas |
 
-O script SQL completo para criação das tabelas e políticas RLS pode ser consultado diretamente em [src/lib/supabase.ts](src/lib/supabase.ts) ou na aba **Supabase & Banco** dentro do painel administrativo.
+O script SQL completo para criação das 12 tabelas e políticas RLS pode ser consultado diretamente em [src/lib/supabase.ts](src/lib/supabase.ts) ou na aba **Configurações & Banco** dentro do painel administrativo.
 
 ---
 
