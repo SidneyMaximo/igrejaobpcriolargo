@@ -752,7 +752,11 @@ export const supabaseService = {
         mediaFolders: foldersRes.data ? foldersRes.data.map(toMediaFolder) : null,
         mediaItems: itemsRes.data ? itemsRes.data.map(toMediaItem) : null,
         prayerRequests: prayersRes.data ? prayersRes.data.map(toPrayerRequest) : null,
-        members: membersRes.data ? membersRes.data.map(toMember) : null,
+        members: membersRes.data
+          ? membersRes.data
+              .map(toMember)
+              .filter(m => !/^mbr-[1-5]$/.test(m.id) && !/^MBR-202[4-6]-(001|015|088|102|140)$/.test(m.sigiloCode))
+          : null,
         transactions: txRes.data
           ? txRes.data
               .map(toTransaction)
@@ -942,6 +946,12 @@ export const supabaseService = {
     const client = getSupabase();
     if (!client) return;
     await client.from('church_members').delete().eq('id', id);
+  },
+
+  async clearAllMembers() {
+    const client = getSupabase();
+    if (!client) return;
+    await client.from('church_members').delete().neq('id', '___none___');
   },
 
   async upsertTransaction(tx: FinancialTransaction) {

@@ -42,6 +42,7 @@ export const AdminFinancialCRM: React.FC = () => {
     addMember,
     updateMember,
     deleteMember,
+    clearAllMembers,
     adminSession
   } = useChurch();
 
@@ -309,13 +310,29 @@ export const AdminFinancialCRM: React.FC = () => {
             </button>
           )}
           {activeSubTab === 'membros' && (
-            <button
-              onClick={() => setIsMemberModalOpen(true)}
-              className="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-3.5 py-2 rounded-xl shadow transition-all"
-            >
-              <Plus className="w-3.5 h-3.5 text-slate-950" />
-              <span>Novo Membro</span>
-            </button>
+            <>
+              <button
+                onClick={() => setIsMemberModalOpen(true)}
+                className="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-3.5 py-2 rounded-xl shadow transition-all"
+              >
+                <Plus className="w-3.5 h-3.5 text-slate-950" />
+                <span>Novo Membro</span>
+              </button>
+              {members.length > 0 && (
+                <button
+                  onClick={async () => {
+                    if (window.confirm('Atenção: Deseja realmente zerar o cadastro de membros e apagar todos os registros de teste MBR? Esta ação não pode ser desfeita.')) {
+                      await clearAllMembers();
+                    }
+                  }}
+                  className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-rose-900/50 text-slate-300 hover:text-rose-300 border border-slate-700 font-bold text-xs px-3.5 py-2 rounded-xl transition-all"
+                  title="Excluir todos os membros de teste"
+                >
+                  <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Zerar Membros</span>
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -477,56 +494,73 @@ export const AdminFinancialCRM: React.FC = () => {
       {/* SUB-VIEW 2: MEMBROS & CRM */}
       {activeSubTab === 'membros' && (
         <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {members.map((mbr) => {
-              // Calculate this member's total contributions
-              const memberTxs = transactions.filter(t => t.memberId === mbr.id && t.type === 'entrada');
-              const totalContributed = memberTxs.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
-              const lastTx = memberTxs[0];
+          {members.length === 0 ? (
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center">
+              <Users className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+              <h4 className="text-base font-bold text-white mb-1">Nenhum membro cadastrado</h4>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto mb-5">
+                O cadastro de membros está limpo e pronto para receber os registros reais da igreja.
+              </p>
+              <button
+                onClick={() => setIsMemberModalOpen(true)}
+                className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow transition-all"
+              >
+                <Plus className="w-4 h-4 text-slate-950" />
+                <span>Cadastrar Primeiro Membro</span>
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {members.map((mbr) => {
+                // Calculate this member's total contributions
+                const memberTxs = transactions.filter(t => t.memberId === mbr.id && t.type === 'entrada');
+                const totalContributed = memberTxs.reduce((sum, t) => sum + (Number(t.amount) || 0), 0);
+                const lastTx = memberTxs[0];
 
-              return (
-                <div
-                  key={mbr.id}
-                  className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="font-mono text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                        {mbr.sigiloCode}
-                      </span>
-                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
-                        mbr.isBaptized ? 'bg-blue-500/20 text-blue-300' : 'bg-slate-800 text-slate-400'
-                      }`}>
-                        {mbr.isBaptized ? 'Batizado' : 'Congregado'}
-                      </span>
-                    </div>
-
-                    <h4 className="text-base font-bold text-white mb-0.5">
-                      {isSigiloModeActive ? mbr.sigiloCode : mbr.name}
-                    </h4>
-                    {!isSigiloModeActive && (
-                      <p className="text-xs text-slate-400">{mbr.phone || 'Sem telefone'} • {mbr.ministryGroup}</p>
-                    )}
-                  </div>
-
-                  <div className="pt-4 mt-4 border-t border-slate-800">
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-slate-400">Total Dízimos / Ofertas:</span>
-                      <strong className="font-mono font-bold text-emerald-400">
-                        {totalContributed.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                      </strong>
-                    </div>
-                    {lastTx && (
-                      <div className="flex items-center justify-between text-[11px] text-slate-400">
-                        <span>Última contribuição:</span>
-                        <span>{new Date(lastTx.date + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
+                return (
+                  <div
+                    key={mbr.id}
+                    className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-mono text-xs font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                          {mbr.sigiloCode}
+                        </span>
+                        <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                          mbr.isBaptized ? 'bg-blue-500/20 text-blue-300' : 'bg-slate-800 text-slate-400'
+                        }`}>
+                          {mbr.isBaptized ? 'Batizado' : 'Congregado'}
+                        </span>
                       </div>
-                    )}
+
+                      <h4 className="text-base font-bold text-white mb-0.5">
+                        {isSigiloModeActive ? mbr.sigiloCode : mbr.name}
+                      </h4>
+                      {!isSigiloModeActive && (
+                        <p className="text-xs text-slate-400">{mbr.phone || 'Sem telefone'} • {mbr.ministryGroup}</p>
+                      )}
+                    </div>
+
+                    <div className="pt-4 mt-4 border-t border-slate-800">
+                      <div className="flex items-center justify-between text-xs mb-1">
+                        <span className="text-slate-400">Total Dízimos / Ofertas:</span>
+                        <strong className="font-mono font-bold text-emerald-400">
+                          {totalContributed.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        </strong>
+                      </div>
+                      {lastTx && (
+                        <div className="flex items-center justify-between text-[11px] text-slate-400">
+                          <span>Última contribuição:</span>
+                          <span>{new Date(lastTx.date + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 

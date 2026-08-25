@@ -370,73 +370,7 @@ export const INITIAL_PRAYER_REQUESTS: PrayerRequest[] = [
   }
 ];
 
-export const INITIAL_MEMBERS: ChurchMember[] = [
-  {
-    id: 'mbr-1',
-    sigiloCode: 'MBR-2024-001',
-    name: 'Sebastião Alves Moreira',
-    phone: '(11) 98111-2233',
-    email: 'sebastiao.moreira@email.com',
-    address: 'Rua das Flores, 145 - Jd. Esperança',
-    baptismDate: '2015-04-12',
-    ministryRole: 'Diácono / Recepção',
-    isActive: true,
-    joinedDate: '2015-03-01',
-    notes: 'Dizimista fiel e participante ativo do conselho de diáconos.'
-  },
-  {
-    id: 'mbr-2',
-    sigiloCode: 'MBR-2024-015',
-    name: 'Claudia Helena Siqueira',
-    phone: '(11) 99222-3344',
-    email: 'claudia.siqueira@email.com',
-    address: 'Av. Paulista, 800 - Apto 42',
-    baptismDate: '2018-11-20',
-    ministryRole: 'Professora EBD Infantil',
-    isActive: true,
-    joinedDate: '2018-10-05',
-    notes: 'Coordenadora do departamento infantil e ofertante constante.'
-  },
-  {
-    id: 'mbr-3',
-    sigiloCode: 'MBR-2025-088',
-    name: 'Marcos Antonio de Oliveira',
-    phone: '(11) 97333-4455',
-    email: 'marcos.oliveira@email.com',
-    address: 'Rua São Bento, 90',
-    baptismDate: '2021-08-15',
-    ministryRole: 'Membro Ativo',
-    isActive: true,
-    joinedDate: '2021-07-10',
-    notes: 'Contribui preferencialmente via PIX nominal.'
-  },
-  {
-    id: 'mbr-4',
-    sigiloCode: 'MBR-2025-102',
-    name: 'Ana Paula Ferreira Lima',
-    phone: '(11) 96444-5566',
-    email: 'ana.lima@email.com',
-    address: 'Rua do Bosque, 320',
-    baptismDate: '2012-06-03',
-    ministryRole: 'Líder de Louvor',
-    isActive: true,
-    joinedDate: '2012-05-15',
-    notes: 'Vocalista principal do ministério de louvor.'
-  },
-  {
-    id: 'mbr-5',
-    sigiloCode: 'MBR-2026-140',
-    name: 'Família Souza (Doação Conjunta)',
-    phone: '(11) 95555-6677',
-    email: 'familia.souza@email.com',
-    address: 'Al. dos Anjos, 50',
-    baptismDate: '2023-12-10',
-    ministryRole: 'Membros',
-    isActive: true,
-    joinedDate: '2023-11-01',
-    notes: 'Contribuição com voto de fé e missões.'
-  }
-];
+export const INITIAL_MEMBERS: ChurchMember[] = [];
 
 export const INITIAL_TRANSACTIONS: FinancialTransaction[] = [];
 

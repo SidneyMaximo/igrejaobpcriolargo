@@ -89,6 +89,7 @@ interface ChurchContextType {
   addMember: (member: Omit<ChurchMember, 'id' | 'sigiloCode' | 'joinedDate'>) => ChurchMember;
   updateMember: (id: string, member: Partial<ChurchMember>) => void;
   deleteMember: (id: string) => void;
+  clearAllMembers: () => Promise<void>;
   getMemberById: (id: string) => ChurchMember | undefined;
 
   // Financial CRM (Confidential)
@@ -144,7 +145,7 @@ const STORAGE_KEYS = {
   FOLDERS: 'obpc_media_folders_v1',
   MEDIA: 'obpc_media_items_v1',
   PRAYERS: 'obpc_prayers_v1',
-  MEMBERS: 'obpc_members_v1',
+  MEMBERS: 'obpc_members_v2',
   TRANSACTIONS: 'obpc_transactions_v2',
   ADMIN: 'obpc_admin_session_v1',
   SIGILO: 'obpc_sigilo_mode_v1',
@@ -388,7 +389,10 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         if (data.mediaFolders && data.mediaFolders.length > 0) setMediaFolders(data.mediaFolders);
         if (data.mediaItems && data.mediaItems.length > 0) setMediaItems(data.mediaItems);
         if (data.prayerRequests && data.prayerRequests.length > 0) setPrayerRequests(data.prayerRequests);
-        if (data.members && data.members.length > 0) setMembers(data.members);
+        if (data.members) {
+          const cleanMembers = data.members.filter(m => !/^mbr-[1-5]$/.test(m.id) && !/^MBR-202[4-6]-(001|015|088|102|140)$/.test(m.sigiloCode));
+          setMembers(cleanMembers);
+        }
         if (data.transactions) {
           const cleanTx = data.transactions.filter(t => !/^tx-([1-9]|1[0-1])$/.test(t.id) && !/^REC-2026-080[1-6]$/.test(t.receiptNumber) && !/^DESP-2026-080[1-5]$/.test(t.receiptNumber));
           setTransactions(cleanTx);
@@ -535,6 +539,15 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       }
     };
 
+    // Auto-clean legacy dummy members from local storage/state on boot
+    setMembers(prev => {
+      const filtered = prev.filter(m => !/^mbr-[1-5]$/.test(m.id) && !/^MBR-202[4-6]-(001|015|088|102|140)$/.test(m.sigiloCode));
+      if (filtered.length !== prev.length) {
+        localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(filtered));
+      }
+      return filtered;
+    });
+
     // Auto-clean legacy dummy transactions from local storage/state on boot
     setTransactions(prev => {
       const filtered = prev.filter(t => !/^tx-([1-9]|1[0-1])$/.test(t.id) && !/^REC-2026-080[1-6]$/.test(t.receiptNumber) && !/^DESP-2026-080[1-5]$/.test(t.receiptNumber));
@@ -545,6 +558,7 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
     try {
       localStorage.removeItem('obpc_church_info_v1');
+      localStorage.removeItem('obpc_members_v1');
       localStorage.removeItem('obpc_transactions_v1');
       localStorage.removeItem('obpc_system_users_v1');
     } catch (e) {}
@@ -797,6 +811,16 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setMembers(prev => prev.filter(m => m.id !== id));
     supabaseService.deleteMember(id);
     addAuditLog('Membro Excluído', 'MEMBROS', `Membro "${mem?.name || id}" (${mem?.sigiloCode}) removido do cadastro.`, 'aviso');
+  };
+
+  const clearAllMembers = async () => {
+    setMembers([]);
+    localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify([]));
+    try {
+      localStorage.removeItem('obpc_members_v1');
+    } catch (e) {}
+    await supabaseService.clearAllMembers();
+    addAuditLog('Cadastro de Membros Limpo', 'MEMBROS', 'Todos os membros de teste foram removidos do sistema.', 'aviso');
   };
 
   const getMemberById = (id: string) => {
@@ -1164,6 +1188,7 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         addMember,
         updateMember,
         deleteMember,
+        clearAllMembers,
         getMemberById,
         transactions,
         addTransaction,
