@@ -13,7 +13,7 @@ async function deploy() {
   const host = process.env.FTP_HOST || process.env.FTP_SERVER;
   const user = process.env.FTP_USER || process.env.FTP_USERNAME;
   const password = process.env.FTP_PASSWORD || process.env.FTP_PASS;
-  const remoteDir = process.env.FTP_REMOTE_DIR || 'public_html';
+  const remoteDir = process.env.FTP_REMOTE_DIR || process.env.SERVER_DIR || './';
 
   console.log('🚀 ==============================================');
   console.log('🚀 Iniciando processo de Deploy para Hostinger...');
@@ -50,10 +50,15 @@ async function deploy() {
     });
     console.log('✅ Conexão FTP autenticada com sucesso!\n');
 
-    console.log(`📁 Acessando diretório remoto: /${remoteDir}...`);
-    await client.ensureDir(remoteDir);
+    const cleanRemoteDir = remoteDir.trim();
+    if (cleanRemoteDir && cleanRemoteDir !== '.' && cleanRemoteDir !== './' && cleanRemoteDir !== '/') {
+      console.log(`📁 Acessando diretório remoto: ${cleanRemoteDir}...`);
+      await client.ensureDir(cleanRemoteDir);
+    } else {
+      console.log('📁 Acessando diretório raiz do FTP (./)...');
+    }
 
-    console.log(`📤 Enviando arquivos de produção da pasta dist/ para /${remoteDir}/...`);
+    console.log(`📤 Enviando arquivos de produção da pasta dist/ para ${cleanRemoteDir}...`);
     client.trackProgress(info => {
       console.log(`   -> Enviando: ${info.name} (${(info.bytes / 1024).toFixed(1)} KB)`);
     });
