@@ -23,21 +23,51 @@ const STORAGE_SUPABASE_KEY = 'obpc_supabase_anon_key_v1';
 export const DEFAULT_SUPABASE_URL = 'https://pgbmlczhzihihzbxmias.supabase.co';
 export const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_Vb4eWeibhcl2SRhCDkoigg_MAXZvXjx';
 
+export const sanitizeUrl = (raw: string | null | undefined): string => {
+  if (!raw) return '';
+  let str = raw.trim();
+  const mdMatch = str.match(/https?:\/\/[a-zA-Z0-9\-\.]+\.supabase\.co/i);
+  if (mdMatch) {
+    return mdMatch[0];
+  }
+  const httpMatch = str.match(/https?:\/\/[^\s\)\'\"\]]+/i);
+  if (httpMatch) {
+    return httpMatch[0];
+  }
+  return str.replace(/[\s\[\]\(\)\'\"]/g, '').trim();
+};
+
+export const sanitizeKey = (raw: string | null | undefined): string => {
+  if (!raw) return '';
+  return raw.replace(/[\s\[\]\(\)\'\"]/g, '').trim();
+};
+
 export const getSupabaseCredentials = (): { url: string; key: string; isCustom: boolean } => {
   const env = (import.meta as any).env || {};
-  const customUrl = localStorage.getItem(STORAGE_SUPABASE_URL);
-  const customKey = localStorage.getItem(STORAGE_SUPABASE_KEY);
+  let customUrl = sanitizeUrl(localStorage.getItem(STORAGE_SUPABASE_URL));
+  let customKey = sanitizeKey(localStorage.getItem(STORAGE_SUPABASE_KEY));
 
-  if (customUrl && customKey && customUrl.trim() && customKey.trim()) {
-    return { url: customUrl.trim(), key: customKey.trim(), isCustom: true };
+  // Limpeza automática se o localStorage estiver corrompido com sintaxe de markdown
+  const rawStoredUrl = localStorage.getItem(STORAGE_SUPABASE_URL);
+  if (rawStoredUrl && rawStoredUrl !== customUrl) {
+    if (customUrl && customUrl.startsWith('http')) {
+      localStorage.setItem(STORAGE_SUPABASE_URL, customUrl);
+    } else {
+      localStorage.removeItem(STORAGE_SUPABASE_URL);
+      customUrl = '';
+    }
   }
 
-  const envUrl = env.VITE_SUPABASE_URL || env.SUPABASE_URL || DEFAULT_SUPABASE_URL;
-  const envKey = env.VITE_SUPABASE_ANON_KEY || env.SUPABASE_PUBLISHABLE_KEY || DEFAULT_SUPABASE_ANON_KEY;
+  if (customUrl && customKey && customUrl.startsWith('http')) {
+    return { url: customUrl, key: customKey, isCustom: true };
+  }
+
+  const envUrl = sanitizeUrl(env.VITE_SUPABASE_URL || env.SUPABASE_URL) || DEFAULT_SUPABASE_URL;
+  const envKey = sanitizeKey(env.VITE_SUPABASE_ANON_KEY || env.SUPABASE_PUBLISHABLE_KEY) || DEFAULT_SUPABASE_ANON_KEY;
 
   return {
-    url: (envUrl || DEFAULT_SUPABASE_URL).trim(),
-    key: (envKey || DEFAULT_SUPABASE_ANON_KEY).trim(),
+    url: envUrl,
+    key: envKey,
     isCustom: false
   };
 };
