@@ -142,7 +142,7 @@ export const ChurchLocationSection: React.FC = () => {
 
               <div className="pt-4 border-t border-slate-200 mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                  <span className="text-[10px] text-slate-400 block uppercase font-bold">Pastores</span>
+                  <span className="text-[10px] text-slate-400 block uppercase font-bold">Pastor Titular</span>
                   <strong className="text-slate-900 text-xs">{churchInfo.pastorName}</strong>
                 </div>
 

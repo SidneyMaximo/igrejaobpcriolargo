@@ -138,7 +138,7 @@ interface ChurchContextType {
 const ChurchContext = createContext<ChurchContextType | null>(null);
 
 const STORAGE_KEYS = {
-  INFO: 'obpc_church_info_v1',
+  INFO: 'obpc_church_info_v2',
   SCHEDULES: 'obpc_schedules_v2',
   EVENTS: 'obpc_events_v1',
   FOLDERS: 'obpc_media_folders_v1',
@@ -168,6 +168,18 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const saved = localStorage.getItem(STORAGE_KEYS.INFO);
       if (saved) {
         const parsed = JSON.parse(saved);
+        if (!parsed.pastorName || parsed.pastorName.includes('Carlos') || parsed.pastorName.includes('Eduardo') || parsed.pastorName.includes('Marlene')) {
+          parsed.pastorName = 'Pr. Janildo Manoel';
+          parsed.vicePastorName = '';
+        }
+        if (parsed.address && parsed.address.includes('Nações Unidas')) {
+          parsed.address = 'Loteamento 3 amigos, 3 - Forene';
+          parsed.cityState = 'Rio Largo - AL';
+          parsed.zipCode = '57100-000';
+          parsed.phone = '(82) 3214-8800';
+          parsed.whatsapp = '(82) 999694402';
+          parsed.email = 'obpcriolargo@gmail.com';
+        }
         if (parsed.pixKey === '45.123.890/0001-55' || parsed.pixKey === '00.123.456/0001-99' || !parsed.pixKey) {
           parsed.pixKey = '82999694402';
           parsed.pixKeyType = 'Telefone';
@@ -347,7 +359,24 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       );
 
       if (hasRemoteData) {
-        if (data.churchInfo) setChurchInfo(data.churchInfo);
+        if (data.churchInfo) {
+          const info = data.churchInfo;
+          if (info.pastorName && (info.pastorName.includes('Carlos') || info.pastorName.includes('Eduardo') || info.pastorName.includes('Marlene'))) {
+            info.pastorName = 'Pr. Janildo Manoel';
+            info.vicePastorName = '';
+            supabaseService.updateChurchInfo(info);
+          }
+          if (info.address && info.address.includes('Nações Unidas')) {
+            info.address = 'Loteamento 3 amigos, 3 - Forene';
+            info.cityState = 'Rio Largo - AL';
+            info.zipCode = '57100-000';
+            info.phone = '(82) 3214-8800';
+            info.whatsapp = '(82) 999694402';
+            info.email = 'obpcriolargo@gmail.com';
+            supabaseService.updateChurchInfo(info);
+          }
+          setChurchInfo(info);
+        }
         if (data.schedules && data.schedules.length > 0) setSchedules(data.schedules);
         if (data.events && data.events.length > 0) setEvents(data.events);
         if (data.mediaFolders && data.mediaFolders.length > 0) setMediaFolders(data.mediaFolders);
@@ -509,7 +538,9 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       return filtered;
     });
     try {
+      localStorage.removeItem('obpc_church_info_v1');
       localStorage.removeItem('obpc_transactions_v1');
+      localStorage.removeItem('obpc_system_users_v1');
     } catch (e) {}
 
     initializeSupabase();

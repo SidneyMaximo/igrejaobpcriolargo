@@ -114,13 +114,13 @@ CREATE TABLE IF NOT EXISTS church_info (
   name TEXT NOT NULL DEFAULT 'Igreja O Brasil Para Cristo',
   subtitle TEXT DEFAULT 'Uma Família que Ama a Deus, Serve ao Próximo e Vive a Palavra',
   pastor_name TEXT DEFAULT 'Pr. Janildo Manoel',
-  vice_pastor_name TEXT DEFAULT 'Pr. Marcos Vinicius',
-  address TEXT DEFAULT 'Av. das Nações Unidas, 1420 - Bairro Central',
-  city_state TEXT DEFAULT 'São Paulo - SP',
-  zip_code TEXT DEFAULT '01310-200',
-  phone TEXT DEFAULT '(11) 3214-8800',
-  whatsapp TEXT DEFAULT '(11) 99876-5432',
-  email TEXT DEFAULT 'contato@obrasilparacristo.org.br',
+  vice_pastor_name TEXT DEFAULT '',
+  address TEXT DEFAULT 'Loteamento 3 amigos, 3 - Forene',
+  city_state TEXT DEFAULT 'Rio Largo - AL',
+  zip_code TEXT DEFAULT '57100-000',
+  phone TEXT DEFAULT '(82) 3214-8800',
+  whatsapp TEXT DEFAULT '(82) 999694402',
+  email TEXT DEFAULT 'obpcriolargo@gmail.com',
   pix_key TEXT DEFAULT '82999694402',
   pix_key_type TEXT DEFAULT 'Telefone',
   pix_recipient TEXT DEFAULT 'Igreja O Brasil Para Cristo',
@@ -380,29 +380,39 @@ export const SUPABASE_SQL_SCHEMA = SUPABASE_SCHEMA_SQL;
 // 3. CONVERSORES DE FORMATO (DATABASE SNAKE_CASE <-> APP CAMELCASE)
 // ==============================================================================
 
-export const toChurchInfo = (row: any): ChurchInfo => ({
-  name: row.name || 'Igreja O Brasil Para Cristo',
-  subtitle: row.subtitle || '',
-  pastorName: row.pastor_name || '',
-  vicePastorName: row.vice_pastor_name || '',
-  address: row.address || '',
-  cityState: row.city_state || '',
-  zipCode: row.zip_code || '',
-  phone: row.phone || '',
-  whatsapp: row.whatsapp || '',
-  email: row.email || '',
-  pixKey: row.pix_key || '',
-  pixKeyType: row.pix_key_type || 'Telefone',
-  pixRecipient: row.pix_recipient || 'Igreja O Brasil Para Cristo',
-  bankName: row.bank_name || '',
-  bankAgency: row.bank_agency || '',
-  bankAccount: row.bank_account || '',
-  youtubeChannelUrl: row.youtube_channel_url || '',
-  instagramUrl: row.instagram_url || '',
-  facebookUrl: row.facebook_url || '',
-  liveStreamUrl: row.live_stream_url || '',
-  historyText: row.history_text || ''
-});
+export const toChurchInfo = (row: any): ChurchInfo => {
+  let pastorName = row.pastor_name || 'Pr. Janildo Manoel';
+  if (pastorName.includes('Carlos') || pastorName.includes('Eduardo') || pastorName.includes('Marlene')) {
+    pastorName = 'Pr. Janildo Manoel';
+  }
+  let address = row.address || 'Loteamento 3 amigos, 3 - Forene';
+  if (address.includes('Nações Unidas')) {
+    address = 'Loteamento 3 amigos, 3 - Forene';
+  }
+  return {
+    name: row.name || 'Igreja O Brasil Para Cristo',
+    subtitle: row.subtitle || '',
+    pastorName,
+    vicePastorName: row.vice_pastor_name || '',
+    address,
+    cityState: row.city_state || 'Rio Largo - AL',
+    zipCode: row.zip_code || '57100-000',
+    phone: row.phone || '(82) 3214-8800',
+    whatsapp: row.whatsapp || '(82) 999694402',
+    email: row.email || 'obpcriolargo@gmail.com',
+    pixKey: row.pix_key || '82999694402',
+    pixKeyType: row.pix_key_type || 'Telefone',
+    pixRecipient: row.pix_recipient || 'Igreja O Brasil Para Cristo',
+    bankName: row.bank_name || 'Mercado Pago',
+    bankAgency: row.bank_agency || '',
+    bankAccount: row.bank_account || '',
+    youtubeChannelUrl: row.youtube_channel_url || 'https://youtube.com/@obpcriolargo',
+    instagramUrl: row.instagram_url || 'https://instagram.com/obpcriolargo',
+    facebookUrl: row.facebook_url || 'https://facebook.com',
+    liveStreamUrl: row.live_stream_url || 'https://youtube.com/@obpcriolargo/live',
+    historyText: row.history_text || ''
+  };
+};
 
 export const fromChurchInfo = (info: ChurchInfo) => ({
   id: 'main',
