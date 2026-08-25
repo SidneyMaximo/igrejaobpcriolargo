@@ -97,7 +97,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onBackToPublicSite }) 
             
             <div className="hidden md:flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700 text-xs">
               <UserCheck className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-white font-semibold">{adminSession?.username || 'Líder'}</span>
+              <span className="text-white font-semibold">
+                {adminSession?.username && !adminSession.username.includes('Carlos') ? adminSession.username : 'Pr. Janildo Manoel'}
+              </span>
               <span className="text-[10px] uppercase font-bold text-amber-400 bg-slate-900 px-1.5 py-0.5 rounded">
                 {adminSession?.role || 'pastor'}
               </span>

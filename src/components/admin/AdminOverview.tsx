@@ -47,7 +47,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({ onNavigateTab }) =
             <span>Gabinete de Gestão Eclesiástica</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-white">
-            Bem-vindo(a), {adminSession?.username || 'Líder'}
+            Bem-vindo(a), {adminSession?.username && !adminSession.username.includes('Carlos') ? adminSession.username : 'Pr. Janildo Manoel'}
           </h2>
           <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
             Painel administrativo da Igreja O Brasil Para Cristo. Atualize os cultos, fotos, vídeos, gabinete de oração e controle a tesouraria com sigilo pastoral.

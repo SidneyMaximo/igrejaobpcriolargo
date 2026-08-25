@@ -227,7 +227,13 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(() => safeParse(STORAGE_KEYS.LOGS, INITIAL_AUDIT_LOGS));
 
   // 10. Admin Session & Privacy
-  const [adminSession, setAdminSession] = useState<AdminSession | null>(() => safeParse(STORAGE_KEYS.ADMIN, null));
+  const [adminSession, setAdminSession] = useState<AdminSession | null>(() => {
+    const session = safeParse<AdminSession | null>(STORAGE_KEYS.ADMIN, null);
+    if (session && session.username && (session.username.includes('Carlos') || session.username.includes('Eduardo'))) {
+      return { ...session, username: 'Pr. Janildo Manoel' };
+    }
+    return session;
+  });
 
   const [isSigiloModeActive, setIsSigiloModeActive] = useState<boolean>(() => safeParse(STORAGE_KEYS.SIGILO, true));
 
