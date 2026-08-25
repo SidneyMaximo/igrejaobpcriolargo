@@ -1,39 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <defs>
-    <linearGradient id="favG" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00a844"/>
-      <stop offset="100%" stop-color="#006324"/>
+    <!-- Background Gradient -->
+    <radialGradient id="favBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#092970" />
+      <stop offset="100%" stop-color="#020c26" />
+    </radialGradient>
+    
+    <!-- Symbol Gradients -->
+    <linearGradient id="symG" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00e676"/>
+      <stop offset="100%" stop-color="#008435"/>
     </linearGradient>
-    <linearGradient id="favY" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fff000"/>
-      <stop offset="100%" stop-color="#fbc02d"/>
+    <linearGradient id="symY" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffea00"/>
+      <stop offset="100%" stop-color="#ff9100"/>
     </linearGradient>
-    <linearGradient id="favB" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#1872e8"/>
-      <stop offset="100%" stop-color="#052866"/>
+    <linearGradient id="symB" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2979ff"/>
+      <stop offset="100%" stop-color="#0039cb"/>
+    </linearGradient>
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd54f"/>
+      <stop offset="100%" stop-color="#ff8f00"/>
     </linearGradient>
   </defs>
 
-  <!-- Scaled, centered OBPC Symbol -->
-  <g transform="translate(-3, -22) scale(0.68)">
-    <!-- Top yellow arc -->
-    <path d="M 68 108 C 88 108, 120 95, 175 88 C 218 82, 235 90, 245 92 C 205 105, 170 125, 150 148 C 110 128, 85 116, 68 108 Z" fill="url(#favY)" stroke="#ffffff" stroke-width="2"/>
+  <!-- Circular Badge for high contrast in all browser themes (Light & Dark) -->
+  <circle cx="64" cy="64" r="60" fill="url(#favBg)" stroke="url(#borderGrad)" stroke-width="4"/>
 
-    <!-- Green Wing Body -->
-    <path d="M 12 172 C 30 152, 55 130, 68 108 C 65 125, 80 138, 98 140 C 65 146, 38 160, 12 172 Z" fill="url(#favG)" stroke="url(#favY)" stroke-width="2"/>
-    <path d="M 12 172 C 45 160, 95 140, 150 148 C 175 152, 195 158, 210 160 C 160 165, 105 178, 12 172 Z" fill="url(#favG)"/>
-    <path d="M 68 108 C 95 110, 140 100, 195 90 C 165 115, 145 138, 135 152 C 105 148, 80 135, 68 108 Z" fill="url(#favG)"/>
+  <!-- Centered OBPC Symbol -->
+  <g transform="translate(64, 64) scale(0.48) translate(-128, -135)">
+    <!-- Top yellow arc trim -->
+    <path d="M 68 108 C 88 108, 120 95, 175 88 C 218 82, 235 90, 245 92 C 205 105, 170 125, 150 148 C 110 128, 85 116, 68 108 Z" fill="url(#symY)" stroke="#ffffff" stroke-width="2"/>
+
+    <!-- Main Green Body -->
+    <path d="M 12 172 C 30 152, 55 130, 68 108 C 65 125, 80 138, 98 140 C 65 146, 38 160, 12 172 Z" fill="url(#symG)" stroke="url(#symY)" stroke-width="2"/>
+    <path d="M 12 172 C 45 160, 95 140, 150 148 C 175 152, 195 158, 210 160 C 160 165, 105 178, 12 172 Z" fill="url(#symG)"/>
+    <path d="M 68 108 C 95 110, 140 100, 195 90 C 165 115, 145 138, 135 152 C 105 148, 80 135, 68 108 Z" fill="url(#symG)"/>
     
-    <!-- Yellow Outer Border -->
-    <path d="M 12 172 C 32 148, 62 118, 68 108 C 98 105, 160 88, 248 92 C 205 105, 168 130, 148 152 C 180 155, 202 158, 212 160 C 145 168, 80 178, 12 172 Z" fill="none" stroke="url(#favY)" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- Outer Yellow Outline Border contour -->
+    <path d="M 12 172 C 32 148, 62 118, 68 108 C 98 105, 160 88, 248 92 C 205 105, 168 130, 148 152 C 180 155, 202 158, 212 160 C 145 168, 80 178, 12 172 Z" fill="none" stroke="url(#symY)" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
 
-    <!-- Bottom Yellow Accent -->
-    <path d="M 98 140 C 135 150, 175 154, 212 160 C 158 166, 110 174, 18 174" fill="none" stroke="url(#favY)" stroke-width="3" stroke-linecap="round"/>
+    <!-- Bottom Yellow Accent Curve -->
+    <path d="M 98 140 C 135 150, 175 154, 212 160 C 158 166, 110 174, 18 174" fill="none" stroke="url(#symY)" stroke-width="3.5" stroke-linecap="round"/>
 
-    <!-- Blue Sphere & White Arc -->
+    <!-- Blue Celestial Globe -->
     <g transform="translate(162, 106)">
-      <path d="M 2 30 C 0 10, 18 -6, 42 -6 C 58 -6, 68 2, 70 8 C 58 24, 48 38, 42 50 C 22 48, 6 42, 2 30 Z" fill="url(#favB)" stroke="#ffffff" stroke-width="2"/>
-      <path d="M 0 32 C 14 18, 30 6, 52 0 C 50 6, 46 14, 42 22 C 26 26, 12 30, 0 32 Z" fill="#ffffff"/>
+      <path d="M 2 30 C 0 10, 18 -6, 42 -6 C 58 -6, 68 2, 70 8 C 58 24, 48 38, 42 50 C 22 48, 6 42, 2 30 Z" fill="url(#symB)" stroke="#ffffff" stroke-width="2.5"/>
+      <path d="M 0 32 C 14 18, 30 6, 52 0 C 50 6, 46 14, 42 22 C 26 26, 12 30, 0 32 Z" fill="#ffffff" opacity="0.95"/>
     </g>
   </g>
 </svg>
