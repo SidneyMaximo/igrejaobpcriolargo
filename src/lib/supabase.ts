@@ -310,6 +310,7 @@ ALTER TABLE church_members ENABLE ROW LEVEL SECURITY;
 ALTER TABLE financial_transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE system_users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE church_departments ENABLE ROW LEVEL SECURITY;
 
 -- Políticas de Acesso Permissivas
 DROP POLICY IF EXISTS "Allow All Info" ON church_info;
@@ -345,6 +346,9 @@ CREATE POLICY "Allow All Users" ON system_users FOR ALL USING (true) WITH CHECK 
 DROP POLICY IF EXISTS "Allow All Logs" ON audit_logs;
 CREATE POLICY "Allow All Logs" ON audit_logs FOR ALL USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Allow All Departments" ON church_departments;
+CREATE POLICY "Allow All Departments" ON church_departments FOR ALL USING (true) WITH CHECK (true);
+
 -- Habilitar Realtime
 ALTER PUBLICATION supabase_realtime ADD TABLE prayer_requests;
 ALTER PUBLICATION supabase_realtime ADD TABLE church_events;
@@ -353,6 +357,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE weekly_schedules;
 ALTER PUBLICATION supabase_realtime ADD TABLE financial_transactions;
 ALTER PUBLICATION supabase_realtime ADD TABLE system_users;
 ALTER PUBLICATION supabase_realtime ADD TABLE audit_logs;
+ALTER PUBLICATION supabase_realtime ADD TABLE church_departments;
 
 -- ==============================================================================
 -- 12. SUPABASE STORAGE: BUCKET PARA FOTOS E MÍDIAS DA IGREJA
