@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { 
   Database, 
   Check, 
-  Copy, 
   Download, 
   RefreshCw, 
   AlertCircle, 
@@ -10,9 +9,9 @@ import {
   DownloadCloud, 
   CheckCircle2,
   Building2,
-  ShieldCheck
+  ShieldCheck,
+  Lock
 } from 'lucide-react';
-import { SUPABASE_SCHEMA_SQL } from '../../lib/supabase';
 import { useChurch } from '../../context/ChurchContext';
 
 export const AdminSupabaseSettings: React.FC = () => {
@@ -20,7 +19,6 @@ export const AdminSupabaseSettings: React.FC = () => {
     schedules, 
     events, 
     departments,
-    addDepartment,
     toggleDepartmentStatus,
     mediaFolders, 
     mediaItems, 
@@ -37,7 +35,6 @@ export const AdminSupabaseSettings: React.FC = () => {
     checkSupabaseHealth
   } = useChurch();
 
-  const [copied, setCopied] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [testingConnection, setTestingConnection] = useState(false);
 
@@ -46,7 +43,9 @@ export const AdminSupabaseSettings: React.FC = () => {
     try {
       localStorage.removeItem('obpc_supabase_url_v1');
       localStorage.removeItem('obpc_supabase_anon_key_v1');
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Could not clear legacy storage keys', e);
+    }
     checkSupabaseHealth();
   }, [checkSupabaseHealth]);
 
@@ -71,12 +70,6 @@ export const AdminSupabaseSettings: React.FC = () => {
   const [instagramUrl, setInstagramUrl] = useState(churchInfo.instagramUrl || '');
   const [historyText, setHistoryText] = useState(churchInfo.historyText || '');
   const [isSaved, setIsSaved] = useState(false);
-
-  const handleCopySql = () => {
-    navigator.clipboard.writeText(SUPABASE_SCHEMA_SQL);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 3000);
-  };
 
   const handleTestConnection = async () => {
     setTestingConnection(true);
@@ -172,10 +165,10 @@ export const AdminSupabaseSettings: React.FC = () => {
         <div>
           <h3 className="text-xl font-bold text-white flex items-center gap-2">
             <Database className="w-5 h-5 text-amber-400" />
-            Backend Supabase Cloud & Dados Institucionais
+            Configurações &amp; Banco de Dados
           </h3>
           <p className="text-xs text-slate-400 mt-1">
-            Persistência em nuvem PostgreSQL em tempo real, sincronização de dados e dados cadastrais da igreja.
+            Persistência em nuvem PostgreSQL em tempo real, sincronização e dados cadastrais da igreja.
           </p>
         </div>
 
@@ -267,58 +260,46 @@ export const AdminSupabaseSettings: React.FC = () => {
           </div>
         )}
 
-        {/* Security & Cloud Infrastructure Card */}
-        <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-5 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <h5 className="text-sm font-bold text-white flex items-center gap-2">
-                  <span>Banco de Dados em Nuvem (PostgreSQL)</span>
-                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                    Criptografia SSL/TLS Ativa
-                  </span>
-                </h5>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Armazenamento seguro e criptografado em nuvem para cultos, membros, eventos, mídias e financeiro.
-                </p>
-              </div>
+        {/* Elegant Infrastructure Notice */}
+        <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 sm:p-6 space-y-4">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5" />
             </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={handleCopySql}
-                className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs px-3.5 py-2 rounded-xl border border-slate-700 transition-all shadow"
-                title="Copiar script SQL para criação das 12 tabelas"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-amber-400" />}
-                <span>{copied ? 'Script Copiado!' : 'Copiar Script SQL'}</span>
-              </button>
+            <div>
+              <h5 className="text-sm font-bold text-white flex items-center gap-2">
+                <span>Infraestrutura e Segurança de Dados</span>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  Gerenciamento Seguro
+                </span>
+              </h5>
+              <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
+                As configurações de banco de dados e credenciais do Supabase agora são injetadas automaticamente de forma segura pelo servidor durante a construção do sistema. Nenhuma ação manual é necessária.
+              </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-800/80 text-xs">
-            <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-              <span className="text-[11px] text-slate-400 block mb-0.5">Servidor em Nuvem:</span>
-              <span className="text-slate-200 font-semibold truncate block flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Supabase PostgreSQL 15 (Protegido)</span>
-              </span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-800/80 text-xs">
+            <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center gap-2.5">
+              <Lock className="w-4 h-4 text-emerald-400 shrink-0" />
+              <div>
+                <span className="text-[10px] text-slate-400 block">Ambiente</span>
+                <span className="text-slate-200 font-semibold truncate block">Injeção Automática de Secrets</span>
+              </div>
             </div>
-            <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-              <span className="text-[11px] text-slate-400 block mb-0.5">Esquema Relacional:</span>
-              <span className="text-emerald-400 font-semibold block">
-                12 Tabelas com RLS Ativo
-              </span>
+            <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center gap-2.5">
+              <ShieldCheck className="w-4 h-4 text-sky-400 shrink-0" />
+              <div>
+                <span className="text-[10px] text-slate-400 block">Comunicação</span>
+                <span className="text-slate-200 font-semibold truncate block">Criptografia SSL/TLS Ativa</span>
+              </div>
             </div>
-            <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800">
-              <span className="text-[11px] text-slate-400 block mb-0.5">Sincronização em Tempo Real:</span>
-              <span className="text-sky-400 font-semibold block">
-                WebSockets &amp; Postgres WAL
-              </span>
+            <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center gap-2.5">
+              <Database className="w-4 h-4 text-amber-400 shrink-0" />
+              <div>
+                <span className="text-[10px] text-slate-400 block">Banco de Dados</span>
+                <span className="text-slate-200 font-semibold truncate block">PostgreSQL Supabase</span>
+              </div>
             </div>
           </div>
         </div>
@@ -363,36 +344,6 @@ export const AdminSupabaseSettings: React.FC = () => {
               {isSyncing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <DownloadCloud className="w-3.5 h-3.5" />}
               <span>Atualizar do Supabase &gt; Local</span>
             </button>
-          </div>
-        </div>
-
-        {/* SQL Script Viewer */}
-        <div className="pt-4 border-t border-slate-800 space-y-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
-              <Terminal className="w-4 h-4 text-amber-400" />
-              <span>Script SQL de Estrutura do Banco (Tabelas, RLS e Realtime)</span>
-            </div>
-            <button
-              onClick={handleCopySql}
-              className="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow self-start sm:self-auto"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-3.5 h-3.5 text-slate-950" />
-                  <span>Script SQL Copiado!</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5" />
-                  <span>Copiar Script SQL</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 max-h-48 overflow-y-auto font-mono text-[11px] text-slate-300">
-            <pre>{SUPABASE_SCHEMA_SQL}</pre>
           </div>
         </div>
       </div>
@@ -526,7 +477,7 @@ export const AdminSupabaseSettings: React.FC = () => {
 
           <div className="pt-3 border-t border-slate-800">
             <h5 className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3">
-              Dados Financeiros & Chave PIX Oficial da Igreja
+              Dados Financeiros &amp; Chave PIX Oficial da Igreja
             </h5>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -662,7 +613,7 @@ export const AdminSupabaseSettings: React.FC = () => {
               <Building2 className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-white text-base">Departamentos & Ministérios da Igreja</h4>
+              <h4 className="font-bold text-white text-base">Departamentos &amp; Ministérios da Igreja</h4>
               <p className="text-xs text-slate-400">
                 Departamentos ativos exibidos no site e associados aos cultos ({departments.length} cadastrados).
               </p>
