@@ -13,7 +13,7 @@ async function deploy() {
   const host = process.env.FTP_HOST || process.env.FTP_SERVER;
   const user = process.env.FTP_USER || process.env.FTP_USERNAME;
   const password = process.env.FTP_PASSWORD || process.env.FTP_PASS;
-  const remoteDir = process.env.FTP_REMOTE_DIR || process.env.SERVER_DIR || './';
+  const remoteDir = '/';
 
   console.log('🚀 ==============================================');
   console.log('🚀 Iniciando processo de Deploy para Hostinger...');
