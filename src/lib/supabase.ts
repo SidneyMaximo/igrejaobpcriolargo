@@ -15,14 +15,8 @@ import {
 } from '../types';
 
 // ==============================================================================
-// 1. CREDENCIAIS & GERENCIAMENTO DINÂMICO DE CLIENTE SUPABASE
+// 1. CREDENCIAIS & CLIENTE SUPABASE (EXCLUSIVAMENTE VIA VARIÁVEIS DE AMBIENTE VITE)
 // ==============================================================================
-const STORAGE_SUPABASE_URL = 'obpc_supabase_url_v1';
-const STORAGE_SUPABASE_KEY = 'obpc_supabase_anon_key_v1';
-
-export const DEFAULT_SUPABASE_URL = 'https://pgbmlczhzihihzbxmias.supabase.co';
-export const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_Vb4eWeibhcl2SRhCDkoigg_MAXZvXjx';
-
 export const sanitizeUrl = (raw: string | null | undefined): string => {
   if (!raw) return '';
   let str = raw.trim();
@@ -43,15 +37,8 @@ export const sanitizeKey = (raw: string | null | undefined): string => {
 };
 
 export const getSupabaseCredentials = (): { url: string; key: string; isCustom: boolean } => {
-  // Prioridade absoluta: variáveis de ambiente injetadas no build pelo Vite / import.meta.env
-  const envUrl = sanitizeUrl(import.meta.env.VITE_SUPABASE_URL) || DEFAULT_SUPABASE_URL;
-  const envKey = sanitizeKey(import.meta.env.VITE_SUPABASE_ANON_KEY) || DEFAULT_SUPABASE_ANON_KEY;
-
-  // Limpeza garantida de chaves legadas de contingência do localStorage
-  try {
-    localStorage.removeItem(STORAGE_SUPABASE_URL);
-    localStorage.removeItem(STORAGE_SUPABASE_KEY);
-  } catch (e) {}
+  const envUrl = sanitizeUrl(import.meta.env.VITE_SUPABASE_URL);
+  const envKey = sanitizeKey(import.meta.env.VITE_SUPABASE_ANON_KEY);
 
   return {
     url: envUrl,
@@ -96,36 +83,12 @@ export const getSupabase = (): SupabaseClient | null => {
   return currentClient;
 };
 
-export const saveCustomCredentials = (url: string, key: string): boolean => {
-  try {
-    const cleanUrl = url.trim();
-    const cleanKey = key.trim();
-    if (cleanUrl && cleanKey) {
-      localStorage.setItem(STORAGE_SUPABASE_URL, cleanUrl);
-      localStorage.setItem(STORAGE_SUPABASE_KEY, cleanKey);
-      currentClient = createClient(cleanUrl, cleanKey, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true
-        },
-        realtime: {
-          params: {
-            eventsPerSecond: 10
-          }
-        }
-      });
-      return true;
-    }
-    return false;
-  } catch (e) {
-    console.error('Erro ao salvar credenciais do Supabase:', e);
-    return false;
-  }
+export const saveCustomCredentials = (_url: string, _key: string): boolean => {
+  // Descontinuado: as credenciais são injetadas estritamente via variáveis de ambiente
+  return true;
 };
 
-export const clearCustomCredentials = () => {
-  localStorage.removeItem(STORAGE_SUPABASE_URL);
-  localStorage.removeItem(STORAGE_SUPABASE_KEY);
+export const clearCustomCredentials = (): void => {
   currentClient = null;
 };
 
