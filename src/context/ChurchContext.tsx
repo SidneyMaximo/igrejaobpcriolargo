@@ -123,7 +123,7 @@ interface ChurchContextType {
 
   // Admin Auth & Secret Mode
   adminSession: AdminSession | null;
-  loginAdmin: (pinOrPass: string, role?: RoleType, customName?: string, usernameInput?: string) => boolean;
+  loginAdmin: (usernameOrPassword: string, passwordOrRole?: string | RoleType, customName?: string, usernameInput?: string) => Promise<{ success: boolean; message?: string }>;
   logoutAdmin: () => void;
   isSigiloModeActive: boolean;
   toggleSigiloMode: () => void;
@@ -416,7 +416,7 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           const cleanTx = data.transactions.filter(t => !/^tx-([1-9]|1[0-1])$/.test(t.id) && !/^REC-2026-080[1-6]$/.test(t.receiptNumber) && !/^DESP-2026-080[1-5]$/.test(t.receiptNumber));
           setTransactions(cleanTx);
         }
-        if (data.users && data.users.length > 0) setUsers(data.users);
+        if (data.users) setUsers(data.users);
         if (data.logs && data.logs.length > 0) setAuditLogs(data.logs);
       } else {
         await supabaseService.pushAllLocalData({
@@ -1097,79 +1097,84 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   const updatedStatus = (u: SystemUser) => ({ isActive: !u.isActive });
 
-  // Admin Auth with Custom User & Password support
-  const loginAdmin = (pinOrPass: string, role: RoleType = 'pastor', customName?: string, usernameInput?: string): boolean => {
-    const cleanInput = pinOrPass.trim();
-    const cleanUsername = usernameInput?.trim().toLowerCase();
+  // Admin Auth with Strict Supabase System Users Validation
+  const loginAdmin = async (
+    usernameOrPassword: string,
+    passwordOrRole?: string | RoleType,
+    _customName?: string,
+    usernameInput?: string
+  ): Promise<{ success: boolean; message?: string }> => {
+    let cleanUsername = '';
+    let cleanPassword = '';
 
-    // 1. Try matching against registered system users
-    if (cleanUsername) {
-      const foundUser = users.find(u => u.username.toLowerCase() === cleanUsername);
-      if (foundUser) {
-        if (!foundUser.isActive) {
-          addAuditLog('Tentativa de Login Bloqueada', 'AUTH', `Tentativa de login com usuário inativo: ${foundUser.username}.`, 'aviso');
-          return false;
-        }
+    if (usernameInput) {
+      cleanUsername = usernameInput.trim().toLowerCase();
+      cleanPassword = usernameOrPassword.trim();
+    } else if (typeof passwordOrRole === 'string' && passwordOrRole.trim()) {
+      cleanUsername = usernameOrPassword.trim().toLowerCase();
+      cleanPassword = passwordOrRole.trim();
+    } else {
+      cleanUsername = usernameOrPassword.trim().toLowerCase();
+      cleanPassword = '';
+    }
 
-        const isPasswordMatch = (foundUser.password && foundUser.password === cleanInput) || cleanInput === '1234' || cleanInput === 'obpc2026';
-        if (isPasswordMatch) {
-          const nowStr = new Date().toLocaleString('pt-BR');
-          const updatedUsr = { ...foundUser, lastLogin: nowStr };
-          setUsers(prev => prev.map(u => u.id === foundUser.id ? updatedUsr : u));
-          supabaseService.upsertUser(updatedUsr);
+    if (!cleanUsername || !cleanPassword) {
+      return { success: false, message: 'Preencha o usuário e a senha.' };
+    }
 
-          const session: AdminSession = {
-            isAuthenticated: true,
-            username: foundUser.name,
-            role: foundUser.role,
-            loginTime: nowStr
-          };
-          setAdminSession(session);
-          addAuditLog('Login no Sistema', 'AUTH', `Usuário "${foundUser.name}" (${foundUser.username} - ${foundUser.role}) autenticado.`);
-          return true;
-        } else {
-          addAuditLog('Falha no Login', 'AUTH', `Senha incorreta para usuário: ${foundUser.username}.`, 'erro');
-          return false;
-        }
+    // 1. Validação obrigatória via Supabase PostgreSQL
+    const client = getSupabase();
+    if (client && isSupabaseConfigured()) {
+      const authResult = await supabaseService.authenticateUser(cleanUsername, cleanPassword);
+      if (authResult.success && authResult.user) {
+        const loggedUser = authResult.user;
+        const nowStr = new Date().toLocaleString('pt-BR');
+        const session: AdminSession = {
+          isAuthenticated: true,
+          username: loggedUser.name,
+          role: loggedUser.role,
+          loginTime: nowStr
+        };
+        setAdminSession(session);
+        setUsers(prev => prev.map(u => u.id === loggedUser.id ? { ...u, lastLogin: nowStr } : u));
+        addAuditLog('Login no Sistema', 'AUTH', `Usuário "${loggedUser.name}" (${loggedUser.username} - ${loggedUser.role}) autenticado com sucesso.`);
+        return { success: true };
+      } else {
+        addAuditLog('Falha no Login', 'AUTH', `Tentativa de login rejeitada para o usuário: ${cleanUsername}. (${authResult.message || 'Credenciais inválidas'}).`, 'erro');
+        return { success: false, message: authResult.message || 'Usuário ou senha incorretos no banco de dados.' };
       }
     }
 
-    // 2. Try matching password against any registered user
-    const matchedUserByPass = users.find(u => u.password === cleanInput && u.isActive);
-    if (matchedUserByPass) {
-      const nowStr = new Date().toLocaleString('pt-BR');
-      const session: AdminSession = {
-        isAuthenticated: true,
-        username: matchedUserByPass.name,
-        role: matchedUserByPass.role,
-        loginTime: nowStr
-      };
-      setAdminSession(session);
-      addAuditLog('Login no Sistema', 'AUTH', `Usuário "${matchedUserByPass.name}" autenticado.`);
-      return true;
+    // 2. Validação estrita se em modo offline local (sem fallbacks hardcoded)
+    const foundUser = users.find(u => u.username.toLowerCase() === cleanUsername);
+    if (!foundUser) {
+      addAuditLog('Falha no Login', 'AUTH', `Tentativa de login com usuário não cadastrado: ${cleanUsername}.`, 'erro');
+      return { success: false, message: 'Usuário não encontrado no sistema.' };
     }
 
-    // 3. Fallback master pins / pastor login
-    const cleanLower = cleanInput.toLowerCase();
-    const validMasterCodes = ['1234', 'obpc2026', 'pastor', 'admin', 'obpc'];
-    
-    if (validMasterCodes.includes(cleanLower) || cleanInput.length >= 4) {
-      const roleDetermined: RoleType = role;
-      const name = customName || 'Pastor Janildo Manoel';
-
-      const session: AdminSession = {
-        isAuthenticated: true,
-        username: name,
-        role: roleDetermined,
-        loginTime: new Date().toLocaleString('pt-BR')
-      };
-      setAdminSession(session);
-      addAuditLog('Login no Sistema', 'AUTH', `Acesso administrativo (${name} - ${roleDetermined}).`);
-      return true;
+    if (!foundUser.isActive) {
+      addAuditLog('Tentativa de Login Bloqueada', 'AUTH', `Tentativa de login com usuário desativado: ${foundUser.username}.`, 'aviso');
+      return { success: false, message: 'Esta conta de usuário está desativada.' };
     }
 
-    addAuditLog('Tentativa de Acesso Rejeitada', 'AUTH', `Código ou senha inválida digitada.`, 'erro');
-    return false;
+    if (!foundUser.password || foundUser.password !== cleanPassword) {
+      addAuditLog('Falha no Login', 'AUTH', `Senha incorreta digitada para usuário: ${foundUser.username}.`, 'erro');
+      return { success: false, message: 'Senha incorreta.' };
+    }
+
+    const nowStr = new Date().toLocaleString('pt-BR');
+    const updatedUsr = { ...foundUser, lastLogin: nowStr };
+    setUsers(prev => prev.map(u => u.id === foundUser.id ? updatedUsr : u));
+
+    const session: AdminSession = {
+      isAuthenticated: true,
+      username: foundUser.name,
+      role: foundUser.role,
+      loginTime: nowStr
+    };
+    setAdminSession(session);
+    addAuditLog('Login no Sistema', 'AUTH', `Usuário "${foundUser.name}" (${foundUser.username} - ${foundUser.role}) autenticado.`);
+    return { success: true };
   };
 
   const logoutAdmin = () => {

@@ -670,7 +670,7 @@ export const fromSystemUser = (u: SystemUser) => ({
   id: u.id,
   name: u.name,
   username: u.username,
-  password: u.password || '1234',
+  password: u.password || '',
   role: u.role,
   email: u.email || null,
   phone: u.phone || null,
@@ -1091,7 +1091,7 @@ export const supabaseService = {
         return { success: false, message: 'Conta de usuário desativada.' };
       }
 
-      if (user.password === passwordInput.trim() || passwordInput === '1234' || passwordInput === 'obpc2026') {
+      if (user.password && user.password === passwordInput.trim()) {
         const nowStr = new Date().toLocaleString('pt-BR');
         await client.from('system_users').update({ last_login: nowStr }).eq('id', user.id);
         return { success: true, user: { ...user, lastLogin: nowStr } };

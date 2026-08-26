@@ -403,7 +403,7 @@ export const INITIAL_SYSTEM_USERS: SystemUser[] = [
     id: 'usr-1',
     name: 'Pr. Janildo Manoel',
     username: 'pastor',
-    password: '1234', // default demo PIN / password
+    password: '',
     role: 'pastor',
     email: 'pastor.janildo@obrasilparacristo.org.br',
     phone: '(11) 99876-5432',
