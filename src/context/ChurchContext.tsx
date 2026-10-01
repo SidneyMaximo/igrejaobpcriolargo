@@ -3,6 +3,7 @@ import {
   ChurchInfo,
   WeeklySchedule,
   ChurchEvent,
+  EventReport,
   EventRegistration,
   MediaFolder,
   MediaItem,
@@ -69,6 +70,8 @@ interface ChurchContextType {
   updateEvent: (id: string, event: Partial<ChurchEvent>) => void;
   deleteEvent: (id: string) => void;
   registerEvent: (registration: Omit<EventRegistration, 'id' | 'registeredAt'>) => Promise<{ success: boolean; message: string }>;
+  saveEventReport: (eventId: string, report: EventReport) => void;
+  deleteEventReport: (eventId: string) => void;
 
   // Departments / Ministérios (Acesso para todos os usuários)
   departments: ChurchDepartment[];
@@ -677,6 +680,35 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     return { success: true, message: 'Sua inscrição foi confirmada com sucesso! Que Deus abençoe.' };
   };
 
+  const saveEventReport = (eventId: string, report: EventReport) => {
+    setEvents(prev => {
+      const next = prev.map(e => (e.id === eventId ? { ...e, report } : e));
+      const target = next.find(e => e.id === eventId);
+      if (target) supabaseService.upsertEvent(target);
+      return next;
+    });
+    const ev = events.find(e => e.id === eventId);
+    addAuditLog('Relatório de Evento Registrado', 'EVENTOS', `Relatório pós-evento registrado/atualizado para "${ev?.title || eventId}".`);
+  };
+
+  const deleteEventReport = (eventId: string) => {
+    setEvents(prev => {
+      const next = prev.map(e => {
+        if (e.id === eventId) {
+          const clone = { ...e };
+          delete clone.report;
+          return clone;
+        }
+        return e;
+      });
+      const target = next.find(e => e.id === eventId);
+      if (target) supabaseService.upsertEvent(target);
+      return next;
+    });
+    const ev = events.find(e => e.id === eventId);
+    addAuditLog('Relatório de Evento Excluído', 'EVENTOS', `Relatório pós-evento removido do evento "${ev?.title || eventId}".`, 'aviso');
+  };
+
   // Departments / Ministérios (Acesso irrestrito a todos os usuários)
   const addDepartment = (data: Omit<ChurchDepartment, 'id' | 'createdAt'>) => {
     const cleanCode = data.code.trim().toUpperCase();
@@ -1266,6 +1298,8 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         updateEvent,
         deleteEvent,
         registerEvent,
+        saveEventReport,
+        deleteEventReport,
         departments,
         addDepartment,
         updateDepartment,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Database, 
   Check, 
@@ -10,9 +10,15 @@ import {
   CheckCircle2,
   Building2,
   ShieldCheck,
-  Lock
+  Lock,
+  Image as ImageIcon,
+  Upload,
+  RotateCcw,
+  Sparkles,
+  Eye
 } from 'lucide-react';
 import { useChurch } from '../../context/ChurchContext';
+import { supabaseStorageService } from '../../lib/supabase';
 
 export const AdminSupabaseSettings: React.FC = () => {
   const { 
@@ -38,6 +44,26 @@ export const AdminSupabaseSettings: React.FC = () => {
   const [feedbackMsg, setFeedbackMsg] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [testingConnection, setTestingConnection] = useState(false);
 
+  // Logo & Identity Form
+  const [logoUrl, setLogoUrl] = useState(churchInfo.logoUrl || '/obpc-logo.svg');
+  const [logoWhiteUrl, setLogoWhiteUrl] = useState(churchInfo.logoWhiteUrl || '/obpc-logo-white.svg');
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploadingLogoWhite, setIsUploadingLogoWhite] = useState(false);
+  const [logoSavedSuccess, setLogoSavedSuccess] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const logoWhiteInputRef = useRef<HTMLInputElement>(null);
+
+  // Hero Background & Banner Form
+  const [heroBackgroundUrl, setHeroBackgroundUrl] = useState(churchInfo.heroBackgroundUrl || '/bg-obpc.svg');
+  const [heroTitle, setHeroTitle] = useState(churchInfo.heroTitle || 'Por Que Servir a Deus e Cuidar de Vidas?');
+  const [heroSubtitle, setHeroSubtitle] = useState(
+    churchInfo.heroSubtitle ||
+      'Somos uma comunidade viva dedicada ao Evangelho de Jesus Cristo, ao avivamento bíblico, à oração pelos enfermos e ao acolhimento amoroso de cada família.'
+  );
+  const [isUploadingHeroBg, setIsUploadingHeroBg] = useState(false);
+  const [heroSavedSuccess, setHeroSavedSuccess] = useState(false);
+  const heroBgInputRef = useRef<HTMLInputElement>(null);
+
   // Auto-clean any legacy corrupted credentials on mount and verify health
   useEffect(() => {
     try {
@@ -48,6 +74,15 @@ export const AdminSupabaseSettings: React.FC = () => {
     }
     checkSupabaseHealth();
   }, [checkSupabaseHealth]);
+
+  // Sync state if churchInfo changes
+  useEffect(() => {
+    if (churchInfo.logoUrl) setLogoUrl(churchInfo.logoUrl);
+    if (churchInfo.logoWhiteUrl) setLogoWhiteUrl(churchInfo.logoWhiteUrl);
+    if (churchInfo.heroBackgroundUrl) setHeroBackgroundUrl(churchInfo.heroBackgroundUrl);
+    if (churchInfo.heroTitle) setHeroTitle(churchInfo.heroTitle);
+    if (churchInfo.heroSubtitle) setHeroSubtitle(churchInfo.heroSubtitle);
+  }, [churchInfo.logoUrl, churchInfo.logoWhiteUrl, churchInfo.heroBackgroundUrl, churchInfo.heroTitle, churchInfo.heroSubtitle]);
 
   // Church info form
   const [name, setName] = useState(churchInfo.name);
@@ -70,6 +105,96 @@ export const AdminSupabaseSettings: React.FC = () => {
   const [instagramUrl, setInstagramUrl] = useState(churchInfo.instagramUrl || '');
   const [historyText, setHistoryText] = useState(churchInfo.historyText || '');
   const [isSaved, setIsSaved] = useState(false);
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>, isWhite = false) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    if (isWhite) setIsUploadingLogoWhite(true);
+    else setIsUploadingLogo(true);
+
+    const res = await supabaseStorageService.uploadFile(files[0], 'branding');
+    
+    if (isWhite) setIsUploadingLogoWhite(false);
+    else setIsUploadingLogo(false);
+
+    if (res.success && res.url) {
+      if (isWhite) {
+        setLogoWhiteUrl(res.url);
+        updateChurchInfo({ logoWhiteUrl: res.url });
+      } else {
+        setLogoUrl(res.url);
+        updateChurchInfo({ logoUrl: res.url });
+      }
+      setFeedbackMsg({ type: 'success', text: `Logomarca ${isWhite ? 'branca' : 'principal'} enviada e atualizada com sucesso!` });
+      setLogoSavedSuccess(true);
+      setTimeout(() => setLogoSavedSuccess(false), 4000);
+    } else {
+      alert(res.message || 'Erro ao enviar imagem.');
+    }
+  };
+
+  const handleResetLogo = (isWhite = false) => {
+    if (isWhite) {
+      setLogoWhiteUrl('/obpc-logo-white.svg');
+      updateChurchInfo({ logoWhiteUrl: '/obpc-logo-white.svg' });
+      setFeedbackMsg({ type: 'success', text: 'Logo branca restaurada para o padrão oficial OBPC!' });
+    } else {
+      setLogoUrl('/obpc-logo.svg');
+      updateChurchInfo({ logoUrl: '/obpc-logo.svg' });
+      setFeedbackMsg({ type: 'success', text: 'Logo principal restaurada para o padrão oficial OBPC!' });
+    }
+    setLogoSavedSuccess(true);
+    setTimeout(() => setLogoSavedSuccess(false), 4000);
+  };
+
+  const handleSaveLogoDirectly = () => {
+    updateChurchInfo({
+      logoUrl: logoUrl.trim() || '/obpc-logo.svg',
+      logoWhiteUrl: logoWhiteUrl.trim() || '/obpc-logo-white.svg'
+    });
+    setFeedbackMsg({ type: 'success', text: 'Logomarca da igreja atualizada com sucesso no site e painel!' });
+    setLogoSavedSuccess(true);
+    setTimeout(() => setLogoSavedSuccess(false), 4000);
+  };
+
+  const handleHeroBgUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setIsUploadingHeroBg(true);
+    const res = await supabaseStorageService.uploadFile(files[0], 'banners');
+    setIsUploadingHeroBg(false);
+
+    if (res.success && res.url) {
+      setHeroBackgroundUrl(res.url);
+      updateChurchInfo({ heroBackgroundUrl: res.url });
+      setFeedbackMsg({ type: 'success', text: 'Nova imagem de fundo do banner principal enviada e aplicada com sucesso!' });
+      setHeroSavedSuccess(true);
+      setTimeout(() => setHeroSavedSuccess(false), 4000);
+    } else {
+      alert(res.message || 'Erro ao enviar imagem de fundo.');
+    }
+  };
+
+  const handleResetHeroBg = () => {
+    setHeroBackgroundUrl('/bg-obpc.svg');
+    updateChurchInfo({ heroBackgroundUrl: '/bg-obpc.svg' });
+    setFeedbackMsg({ type: 'success', text: 'Fundo azul oficial OBPC restaurado com sucesso!' });
+    setHeroSavedSuccess(true);
+    setTimeout(() => setHeroSavedSuccess(false), 4000);
+  };
+
+  const handleSaveHeroDirectly = () => {
+    updateChurchInfo({
+      heroBackgroundUrl: heroBackgroundUrl.trim() || '/bg-obpc.svg',
+      heroTitle: heroTitle.trim() || 'Por Que Servir a Deus e Cuidar de Vidas?',
+      heroSubtitle: heroSubtitle.trim() || undefined
+    });
+    setFeedbackMsg({ type: 'success', text: 'Banner principal (imagem de fundo e títulos) salvo e aplicado com sucesso!' });
+    setHeroSavedSuccess(true);
+    setTimeout(() => setHeroSavedSuccess(false), 4000);
+  };
 
   const handleTestConnection = async () => {
     setTestingConnection(true);
@@ -135,6 +260,11 @@ export const AdminSupabaseSettings: React.FC = () => {
     updateChurchInfo({
       name,
       subtitle,
+      logoUrl: logoUrl.trim() || '/obpc-logo.svg',
+      logoWhiteUrl: logoWhiteUrl.trim() || '/obpc-logo-white.svg',
+      heroBackgroundUrl: heroBackgroundUrl.trim() || '/bg-obpc.svg',
+      heroTitle: heroTitle.trim() || 'Por Que Servir a Deus e Cuidar de Vidas?',
+      heroSubtitle: heroSubtitle.trim() || undefined,
       address,
       cityState,
       zipCode,
@@ -345,6 +475,427 @@ export const AdminSupabaseSettings: React.FC = () => {
               <span>Atualizar do Supabase &gt; Local</span>
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* Identidade Visual & Gestão de Logomarca */}
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-800">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-amber-400 font-bold text-xs uppercase tracking-wider mb-1">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Identidade Visual do Portal</span>
+            </div>
+            <h4 className="font-bold text-white text-lg">Logomarca Oficial da Igreja</h4>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Altere a logomarca exibida na barra de navegação superior, rodapé, cabeçalho administrativo e relatórios oficiais.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleSaveLogoDirectly}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-md transition-all"
+            >
+              <Check className="w-4 h-4 text-slate-950" />
+              <span>Salvar &amp; Aplicar Logomarca</span>
+            </button>
+          </div>
+        </div>
+
+        {logoSavedSuccess && (
+          <div className="mb-5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2 animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Logomarca atualizada com sucesso em todo o sistema!</span>
+          </div>
+        )}
+
+        {/* Hidden inputs for uploading images */}
+        <input
+          type="file"
+          accept="image/*,.svg"
+          ref={logoInputRef}
+          onChange={(e) => handleLogoUpload(e, false)}
+          className="hidden"
+        />
+        <input
+          type="file"
+          accept="image/*,.svg"
+          ref={logoWhiteInputRef}
+          onChange={(e) => handleLogoUpload(e, true)}
+          className="hidden"
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          
+          {/* 1. Logo Principal (Fundo Claro) */}
+          <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <ImageIcon className="w-4 h-4 text-[#70b83b]" />
+                  <span>Logo Colorida (Para Fundos Claros / Navbar)</span>
+                </span>
+                <span className="text-[10px] font-semibold text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+                  Recomendado SVG ou PNG
+                </span>
+              </div>
+
+              {/* Preview Box Light */}
+              <div className="relative h-28 rounded-xl bg-white border border-slate-300 flex items-center justify-center p-4 overflow-hidden shadow-inner group">
+                <img
+                  src={logoUrl || '/obpc-logo.svg'}
+                  alt="Logo Principal"
+                  className="max-h-16 max-w-full object-contain transition-transform group-hover:scale-105"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/obpc-logo.svg';
+                  }}
+                />
+                <div className="absolute top-2 right-2 text-[10px] bg-slate-900/80 text-white font-mono px-2 py-0.5 rounded backdrop-blur-sm">
+                  Pré-visualização
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                  URL da Imagem / Link Direto
+                </label>
+                <input
+                  type="text"
+                  value={logoUrl}
+                  onChange={(e) => setLogoUrl(e.target.value)}
+                  placeholder="https://... ou /obpc-logo.svg"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => logoInputRef.current?.click()}
+                  disabled={isUploadingLogo}
+                  className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 hover:text-amber-300 border border-slate-700 text-xs font-bold px-3.5 py-2 rounded-xl transition-colors disabled:opacity-50"
+                >
+                  {isUploadingLogo ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Enviando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Fazer Upload do Computador</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleResetLogo(false)}
+                  className="inline-flex items-center gap-1 text-slate-400 hover:text-slate-200 text-xs px-3 py-2 rounded-xl hover:bg-slate-800 transition-colors"
+                  title="Restaurar para a logomarca original"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Restaurar Padrão OBPC</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Logo Versão Branca (Fundo Escuro) */}
+          <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between space-y-4">
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <ImageIcon className="w-4 h-4 text-amber-400" />
+                  <span>Logo Branca / Negativa (Para Fundos Escuros / Rodapé / Painel)</span>
+                </span>
+                <span className="text-[10px] font-semibold text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+                  Alto Contraste
+                </span>
+              </div>
+
+              {/* Preview Box Dark */}
+              <div className="relative h-28 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center p-4 overflow-hidden shadow-inner group">
+                <img
+                  src={logoWhiteUrl || '/obpc-logo-white.svg'}
+                  alt="Logo Versão Branca"
+                  className="max-h-16 max-w-full object-contain transition-transform group-hover:scale-105"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/obpc-logo-white.svg';
+                  }}
+                />
+                <div className="absolute top-2 right-2 text-[10px] bg-slate-900/80 text-white font-mono px-2 py-0.5 rounded backdrop-blur-sm">
+                  Pré-visualização
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                  URL da Imagem / Link Direto
+                </label>
+                <input
+                  type="text"
+                  value={logoWhiteUrl}
+                  onChange={(e) => setLogoWhiteUrl(e.target.value)}
+                  placeholder="https://... ou /obpc-logo-white.svg"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => logoWhiteInputRef.current?.click()}
+                  disabled={isUploadingLogoWhite}
+                  className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 hover:text-amber-300 border border-slate-700 text-xs font-bold px-3.5 py-2 rounded-xl transition-colors disabled:opacity-50"
+                >
+                  {isUploadingLogoWhite ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Enviando...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Fazer Upload do Computador</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleResetLogo(true)}
+                  className="inline-flex items-center gap-1 text-slate-400 hover:text-slate-200 text-xs px-3 py-2 rounded-xl hover:bg-slate-800 transition-colors"
+                  title="Restaurar para a logomarca original"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Restaurar Padrão Branco</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Banner Principal da Página Inicial (Hero Background) */}
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-800">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-amber-400 font-bold text-xs uppercase tracking-wider mb-1">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Página Inicial (Início)</span>
+            </div>
+            <h4 className="font-bold text-white text-lg">Banner Principal (Fundo Azul / Textura Hero)</h4>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Altere a imagem de fundo (background), marca d'água e os títulos principais da seção de abertura do site.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={handleSaveHeroDirectly}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-md transition-all"
+            >
+              <Check className="w-4 h-4 text-slate-950" />
+              <span>Salvar &amp; Aplicar Fundo do Banner</span>
+            </button>
+          </div>
+        </div>
+
+        {heroSavedSuccess && (
+          <div className="mb-5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-center gap-2 animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4" />
+            <span>Fundo e textos do banner principal atualizados com sucesso no site!</span>
+          </div>
+        )}
+
+        {/* Hidden input for uploading hero background */}
+        <input
+          type="file"
+          accept="image/*,.svg"
+          ref={heroBgInputRef}
+          onChange={handleHeroBgUpload}
+          className="hidden"
+        />
+
+        <div className="space-y-6">
+          
+          {/* Live Preview Box of the Hero Banner */}
+          <div>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2 flex items-center gap-1.5">
+              <Eye className="w-4 h-4 text-amber-400" />
+              <span>Pré-visualização em Tempo Real do Banner Inicial</span>
+            </label>
+
+            <div 
+              className="relative min-h-[220px] sm:min-h-[260px] rounded-2xl bg-[#071d5e] bg-cover bg-center bg-no-repeat border border-slate-700 overflow-hidden flex flex-col justify-center p-6 sm:p-8 text-white shadow-2xl transition-all"
+              style={{
+                backgroundImage: `url('${heroBackgroundUrl || '/bg-obpc.svg'}')`
+              }}
+            >
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-slate-950/80 pointer-events-none" />
+
+              <div className="relative z-10 max-w-xl space-y-3">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/80 border border-blue-400/30 text-slate-200 text-[10px] font-bold uppercase tracking-wider">
+                  <Sparkles className="w-3 h-3 text-amber-400" />
+                  <span>Igreja Evangélica Pentecostal O Brasil Para Cristo</span>
+                </div>
+
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-white leading-tight font-display drop-shadow">
+                  {heroTitle || 'Por Que Servir a Deus e Cuidar de Vidas?'}
+                </h3>
+
+                <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium line-clamp-2">
+                  {heroSubtitle || 'Somos uma comunidade viva dedicada ao Evangelho de Jesus Cristo, ao avivamento bíblico, à oração pelos enfermos e ao acolhimento amoroso de cada família.'}
+                </p>
+
+                <div className="pt-1 flex items-center gap-2">
+                  <span className="text-[10px] bg-[#ff5a1f] text-white font-bold px-3 py-1.5 rounded-lg shadow">
+                    Conheça Nossos Cultos
+                  </span>
+                  <span className="text-[10px] bg-slate-900/90 text-slate-300 font-bold px-3 py-1.5 rounded-lg border border-slate-700">
+                    Próximos Eventos
+                  </span>
+                </div>
+              </div>
+
+              <div className="absolute top-3 right-3 text-[10px] bg-slate-900/90 text-white font-mono px-2.5 py-1 rounded-lg border border-slate-700 backdrop-blur-sm">
+                Visualização do Visitante
+              </div>
+            </div>
+          </div>
+
+          {/* Background Image Inputs & Upload */}
+          <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                <ImageIcon className="w-4 h-4 text-amber-400" />
+                <span>Imagem de Fundo do Banner (Background / Textura)</span>
+              </span>
+              <span className="text-[10px] text-slate-400">
+                Recomendado: 1920x1080px (SVG, PNG, JPG ou WebP)
+              </span>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-semibold text-slate-400 mb-1">
+                URL da Imagem de Fundo / Link Direto
+              </label>
+              <input
+                type="text"
+                value={heroBackgroundUrl}
+                onChange={(e) => setHeroBackgroundUrl(e.target.value)}
+                placeholder="https://... ou /bg-obpc.svg"
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white font-mono focus:outline-none focus:border-amber-400"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => heroBgInputRef.current?.click()}
+                disabled={isUploadingHeroBg}
+                className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 hover:text-amber-300 border border-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl transition-colors disabled:opacity-50"
+              >
+                {isUploadingHeroBg ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Enviando imagem...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Upload de Imagem do Computador</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleResetHeroBg}
+                className="inline-flex items-center gap-1 text-slate-400 hover:text-slate-200 text-xs px-3.5 py-2.5 rounded-xl hover:bg-slate-800 border border-slate-800 transition-colors"
+                title="Restaurar para a textura azul original da OBPC"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Restaurar Fundo Padrão Azul OBPC</span>
+              </button>
+            </div>
+
+            {/* Quick Suggestions Presets */}
+            <div className="pt-3 border-t border-slate-800/80">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
+                Sugestões Rápidas de Fundos:
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {[
+                  { label: 'Fundo Azul Oficial OBPC', url: '/bg-obpc.svg' },
+                  { label: 'Adoração & Louvor', url: 'https://images.unsplash.com/photo-1510525009512-ab7522cabb6b?auto=format&fit=crop&w=1920&q=80' },
+                  { label: 'Bíblia Aberta & Luz', url: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&w=1920&q=80' },
+                  { label: 'Comunhão & Ação Social', url: 'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=1920&q=80' }
+                ].map((preset) => (
+                  <button
+                    key={preset.url}
+                    type="button"
+                    onClick={() => {
+                      setHeroBackgroundUrl(preset.url);
+                      updateChurchInfo({ heroBackgroundUrl: preset.url });
+                      setHeroSavedSuccess(true);
+                      setTimeout(() => setHeroSavedSuccess(false), 3000);
+                    }}
+                    className={`p-2 rounded-xl text-left text-[11px] border transition-all flex flex-col justify-between h-16 ${
+                      heroBackgroundUrl === preset.url
+                        ? 'bg-amber-500/15 border-amber-400 text-amber-300 font-bold'
+                        : 'bg-slate-900 hover:bg-slate-850 border-slate-800 text-slate-300'
+                    }`}
+                  >
+                    <span className="line-clamp-1">{preset.label}</span>
+                    <span className="text-[9px] text-slate-500 truncate font-mono">
+                      {preset.url.startsWith('/') ? 'Padrão Local' : 'Unsplash HD'}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Title & Subtitle Customization */}
+          <div className="grid grid-cols-1 gap-4 bg-slate-950/40 border border-slate-800/80 rounded-2xl p-5">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                Título Principal do Banner
+              </label>
+              <input
+                type="text"
+                value={heroTitle}
+                onChange={(e) => setHeroTitle(e.target.value)}
+                placeholder="Por Que Servir a Deus e Cuidar de Vidas?"
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-400"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">
+                Subtítulo / Mensagem de Acolhimento
+              </label>
+              <textarea
+                rows={2}
+                value={heroSubtitle}
+                onChange={(e) => setHeroSubtitle(e.target.value)}
+                placeholder="Somos uma comunidade viva dedicada ao Evangelho de Jesus Cristo..."
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-400 resize-none leading-relaxed"
+              />
+            </div>
+          </div>
+
         </div>
       </div>
 

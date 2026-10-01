@@ -3,6 +3,11 @@ export type RoleType = 'pastor' | 'tesoureiro' | 'secretaria' | 'lider';
 export interface ChurchInfo {
   name: string;
   subtitle: string;
+  logoUrl?: string;
+  logoWhiteUrl?: string;
+  heroBackgroundUrl?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
   pastorName: string;
   vicePastorName: string;
   address: string;
@@ -38,6 +43,18 @@ export interface WeeklySchedule {
   order: number;
 }
 
+export interface EventReport {
+  summary: string;
+  attendeesCount?: number;
+  conversionsCount?: number;
+  baptismsCount?: number;
+  highlights?: string[];
+  testimony?: string;
+  authorName?: string;
+  reportDate?: string;
+  photos?: string[];
+}
+
 export interface ChurchEvent {
   id: string;
   title: string;
@@ -55,6 +72,7 @@ export interface ChurchEvent {
   registeredCount: number;
   guestSpeaker?: string;
   musicalGuest?: string;
+  report?: EventReport;
 }
 
 export interface EventRegistration {

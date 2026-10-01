@@ -70,7 +70,7 @@ export const AdminOverview: React.FC<AdminOverviewProps> = ({ onNavigateTab }) =
             className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs px-4 py-3 rounded-xl border border-slate-700 transition-all"
           >
             <Settings className="w-4 h-4 text-amber-400" />
-            <span>Configurações</span>
+            <span>Configurações & Logomarca</span>
           </button>
         </div>
       </div>

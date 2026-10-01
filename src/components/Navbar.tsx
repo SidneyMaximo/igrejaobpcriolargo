@@ -104,8 +104,8 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="flex items-center gap-3 text-left group focus:outline-none"
         >
           <img 
-            src="/obpc-logo.svg" 
-            alt="Igreja O Brasil Para Cristo" 
+            src={churchInfo.logoUrl || "/obpc-logo.svg"} 
+            alt={churchInfo.name || "Igreja O Brasil Para Cristo"} 
             className="h-10 sm:h-12 w-auto object-contain transition-transform group-hover:scale-105"
           />
         </button>

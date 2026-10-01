@@ -57,8 +57,12 @@ export const ReceiptPrintModal: React.FC<ReceiptPrintModalProps> = ({
           {/* Church Header */}
           <div className="flex items-start justify-between border-b-2 border-slate-800 pb-4 mb-5">
             <div>
-              <div className="flex items-center gap-2">
-                <Church className="w-6 h-6 text-amber-600" />
+              <div className="flex items-center gap-2.5">
+                <img 
+                  src={churchInfo.logoUrl || "/obpc-logo.svg"} 
+                  alt="Logo" 
+                  className="h-8 w-auto object-contain"
+                />
                 <h3 className="font-serif font-black text-lg text-slate-900 uppercase tracking-tight">
                   {churchInfo.name}
                 </h3>

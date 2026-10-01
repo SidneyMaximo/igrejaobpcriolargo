@@ -13,16 +13,21 @@ import {
   CheckCircle2,
   Upload,
   RefreshCw,
-  UploadCloud
+  UploadCloud,
+  FileText,
+  FileCheck,
+  HeartHandshake
 } from 'lucide-react';
 import { useChurch } from '../../context/ChurchContext';
 import { ChurchEvent } from '../../types';
 import { supabaseStorageService } from '../../lib/supabase';
+import { AdminEventReportModal } from './AdminEventReportModal';
 
 export const AdminEvents: React.FC = () => {
   const { events, addEvent, updateEvent, deleteEvent } = useChurch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<ChurchEvent | null>(null);
+  const [selectedEventForReport, setSelectedEventForReport] = useState<ChurchEvent | null>(null);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const bannerInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -211,17 +216,53 @@ export const AdminEvents: React.FC = () => {
                 </div>
                 <h4 className="font-bold text-white text-base mb-1 line-clamp-1">{evt.title}</h4>
                 <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed mb-3">{evt.description}</p>
+                
+                {/* Event Report Status Indicator */}
+                {evt.report ? (
+                  <div className="mb-3 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs flex flex-col gap-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-amber-300 font-bold flex items-center gap-1 text-[11px]">
+                        <FileCheck className="w-3.5 h-3.5 text-amber-400" />
+                        Relatório Disponível
+                      </span>
+                      {evt.report.conversionsCount !== undefined && evt.report.conversionsCount > 0 && (
+                        <span className="text-[10px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded font-semibold">
+                          +{evt.report.conversionsCount} vidas
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-400 line-clamp-1 italic">
+                      "{evt.report.summary}"
+                    </p>
+                  </div>
+                ) : null}
               </div>
 
-              <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                <span className="flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5 text-amber-400" />
-                  <strong>{evt.registeredCount || 0}</strong> inscritos
-                  {evt.registrationLimit ? ` / ${evt.registrationLimit}` : ''}
-                </span>
-                <span className={evt.registrationOpen ? 'text-emerald-400 font-semibold' : 'text-slate-400'}>
-                  {evt.registrationOpen ? 'Inscrições Abertas' : 'Entrada Franca'}
-                </span>
+              <div className="space-y-3 pt-3 border-t border-slate-800">
+                <div className="flex items-center justify-between text-xs text-slate-400">
+                  <span className="flex items-center gap-1">
+                    <Users className="w-3.5 h-3.5 text-amber-400" />
+                    <strong>{evt.registeredCount || 0}</strong> inscritos
+                    {evt.registrationLimit ? ` / ${evt.registrationLimit}` : ''}
+                  </span>
+                  <span className={evt.registrationOpen ? 'text-emerald-400 font-semibold text-[11px]' : 'text-slate-400 text-[11px]'}>
+                    {evt.registrationOpen ? 'Inscrições Abertas' : 'Entrada Franca'}
+                  </span>
+                </div>
+
+                {/* Relatório do Evento Button */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedEventForReport(evt)}
+                  className={`w-full inline-flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-bold transition-all ${
+                    evt.report
+                      ? 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30'
+                      : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
+                  }`}
+                >
+                  <FileText className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{evt.report ? 'Gerenciar Relatório Pós-Evento' : '+ Criar Relatório do Evento'}</span>
+                </button>
               </div>
             </div>
           </div>
@@ -452,6 +493,14 @@ export const AdminEvents: React.FC = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Admin Event Report Modal */}
+      {selectedEventForReport && (
+        <AdminEventReportModal
+          event={selectedEventForReport}
+          onClose={() => setSelectedEventForReport(null)}
+        />
       )}
 
     </div>

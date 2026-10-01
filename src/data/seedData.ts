@@ -15,6 +15,11 @@ import {
 export const INITIAL_CHURCH_INFO: ChurchInfo = {
   name: 'Igreja O Brasil Para Cristo',
   subtitle: 'Uma Família que Ama a Deus, Serve ao Próximo e Vive a Palavra',
+  logoUrl: '/obpc-logo.svg',
+  logoWhiteUrl: '/obpc-logo-white.svg',
+  heroBackgroundUrl: '/bg-obpc.svg',
+  heroTitle: 'Por Que Servir a Deus e Cuidar de Vidas?',
+  heroSubtitle: 'Somos uma comunidade viva dedicada ao Evangelho de Jesus Cristo, ao avivamento bíblico, à oração pelos enfermos e ao acolhimento amoroso de cada família.',
   pastorName: 'Pr. Janildo Manoel',
   vicePastorName: '',
   address: 'Loteamento 3 amigos, 3 - Forene',
@@ -160,7 +165,26 @@ export const INITIAL_EVENTS: ChurchEvent[] = [
     registrationLimit: 450,
     registeredCount: 238,
     guestSpeaker: 'Pr. Josué Gonçalves e Pastores Convidados',
-    musicalGuest: 'Ministério de Louvor Voz da Esperança'
+    musicalGuest: 'Ministério de Louvor Voz da Esperança',
+    report: {
+      summary: 'O Congresso da Família foi marcado por uma forte presença de Deus, restauração de matrimônios e reconciliações familiares em todas as noites. As ministrações abordaram a importância da oração no lar e a educação cristã dos filhos.',
+      attendeesCount: 480,
+      conversionsCount: 19,
+      baptismsCount: 0,
+      highlights: [
+        'Renovação de votos de mais de 80 casais na noite de encerramento',
+        '19 decisões de vidas aceitando a Jesus Cristo',
+        'Palestra especial sobre inteligência emocional bíblica na família',
+        'Forte clamor com imposição de mãos sobre jovens e crianças'
+      ],
+      testimony: 'Casais com divórcio em andamento relataram profunda cura e reconciliação após a oração pastoral.',
+      authorName: 'Pr. Janildo Manoel',
+      reportDate: '2026-09-21',
+      photos: [
+        'https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=800&q=80'
+      ]
+    }
   },
   {
     id: 'evt-2',
@@ -178,7 +202,25 @@ export const INITIAL_EVENTS: ChurchEvent[] = [
     registrationLimit: 500,
     registeredCount: 312,
     guestSpeaker: 'Missionário Daniel Souza (África) & Equipe OBPC',
-    musicalGuest: 'Coral Som do Céu'
+    musicalGuest: 'Coral Som do Céu',
+    report: {
+      summary: 'A Ação Social Mãos que Acolhem e a Conferência Missionária superaram todas as expectativas. Foram realizados atendimentos médicos e odontológicos gratuitos, corte de cabelo, suporte jurídico e entrega de 300 cestas básicas a famílias carentes da nossa comunidade.',
+      attendeesCount: 520,
+      conversionsCount: 14,
+      baptismsCount: 0,
+      highlights: [
+        '300 cestas de alimentos de primeira necessidade distribuídas',
+        '180 atendimentos médicos e de enfermagem realizados',
+        '14 pessoas aceitaram a Cristo durante o culto missionário',
+        'Arrecadação especial de apoio para o campo missionário em Moçambique'
+      ],
+      testimony: 'Uma moradora da Forene testemunhou que a oração e o acolhimento da equipe da igreja transformaram o ambiente de seu lar.',
+      authorName: 'Equipe de Missões & Ação Social OBPC',
+      reportDate: '2026-09-07',
+      photos: [
+        'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=800&q=80'
+      ]
+    }
   },
   {
     id: 'evt-3',

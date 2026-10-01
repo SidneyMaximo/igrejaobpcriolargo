@@ -27,6 +27,8 @@ graph TD
 3. **Resiliência Offline & Fallback Permanente**: Se a conexão com a internet ou com o banco de dados cair, a aplicação continua funcionando normalmente através do armazenamento local.
 4. **Gestão Dinâmica de Credenciais do Supabase**: O cliente Supabase busca chaves através de variáveis de ambiente (`VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`) e permite configuração/edição dinâmica de credenciais com persistência segura em LocalStorage (`obpc_supabase_url_v1` e `obpc_supabase_anon_key_v1`).
 5. **Acesso Universal a Departamentos & Configurações**: Todos os perfis de usuários administrativos (`pastor`, `tesoureiro`, `secretaria`, `lider`) possuem acesso direto à aba de Configurações e ao módulo de criação e gestão de Departamentos & Ministérios.
+6. **Customização Visual Total Dinâmica**: O painel administrativo permite gerenciar e trocar diretamente em tempo real a Logomarca (clara e escura), a imagem de fundo / textura do Hero Banner e os textos de acolhimento sem necessidade de alterar o código-fonte.
+7. **Módulo de Relatórios Pós-Eventos**: Registro completo pós-evento com métricas espirituais (almas salvas, batismos, público), destaques, testemunhos e fotos, com exibição pública e no painel admin.
 
 ---
 
@@ -34,8 +36,8 @@ graph TD
 
 O banco de dados relacional é estruturado em PostgreSQL no Supabase, com suporte a **Row Level Security (RLS)** e **Realtime Publication**.
 
-### 2.1 Tabela `church_info` (Dados Institucionais e PIX)
-Armazena os dados cadastrais da igreja, endereço do templo sede, contatos e chaves PIX.
+### 2.1 Tabela `church_info` (Dados Institucionais, Identidade Visual e PIX)
+Armazena os dados cadastrais da igreja, endereço do templo sede, contatos, chaves PIX e URLs de identidade visual e personalização do Hero Banner.
 ```sql
 CREATE TABLE IF NOT EXISTS public.church_info (
   id TEXT PRIMARY KEY DEFAULT 'main',
@@ -49,6 +51,11 @@ CREATE TABLE IF NOT EXISTS public.church_info (
   phone TEXT DEFAULT '(82) 3214-8800',
   whatsapp TEXT DEFAULT '(82) 999694402',
   email TEXT DEFAULT 'obpcriolargo@gmail.com',
+  logo_url TEXT,
+  logo_white_url TEXT,
+  hero_background_url TEXT,
+  hero_title TEXT,
+  hero_subtitle TEXT,
   pix_key TEXT DEFAULT '82999694402',
   pix_key_type TEXT DEFAULT 'Telefone',
   pix_recipient TEXT DEFAULT 'Igreja O Brasil Para Cristo',
@@ -82,7 +89,8 @@ CREATE TABLE IF NOT EXISTS public.weekly_schedules (
 );
 ```
 
-### 2.3 Tabela `church_events` (Eventos & Conferências)
+### 2.3 Tabela `church_events` (Eventos, Conferências e Relatórios Pós-Eventos)
+Armazena a agenda de eventos futuros e passados, incluindo a coluna `report` em formato `JSONB` com as métricas e testemunhos pós-evento.
 ```sql
 CREATE TABLE IF NOT EXISTS public.church_events (
   id TEXT PRIMARY KEY,
@@ -101,8 +109,25 @@ CREATE TABLE IF NOT EXISTS public.church_events (
   registered_count INTEGER DEFAULT 0,
   guest_speaker TEXT,
   musical_guest TEXT,
+  report JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
+```
+
+#### Estrutura do objeto `report` (JSONB):
+```typescript
+interface EventReport {
+  summary: string;              // Resumo do que aconteceu no evento
+  attendeesCount?: number;      // Estimativa ou contagem de presentes
+  conversionsCount?: number;    // Vidas entregues a Cristo / Decisões
+  baptismsCount?: number;       // Batismos nas Águas ou Espírito Santo
+  highlights?: string[];        // Destaques e momentos marcantes
+  testimony?: string;           // Testemunho de destaque ou milagre relatado
+  photos?: string[];            // Galeria de URLs de fotos pós-evento
+  registeredBy: string;         // Nome do autor do relatório
+  createdAt: string;            // Data e hora de elaboração
+  updatedAt?: string;           // Última atualização
+}
 ```
 
 ### 2.4 Tabela `event_registrations` (Inscrições de Fiéis em Eventos)
@@ -254,26 +279,61 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
 
 ---
 
-## 🔒 3. Controle de Acesso e Segurança
+## 🎨 3. Módulos de Customização Visual & Relatórios (Novidades)
 
-### 3.1 Níveis de Acesso por Função
+### 3.1 Gestão de Relatórios Pós-Eventos
+- **Painel Administrativo (`AdminEventReportModal.tsx`)**:
+  - Botão de ação direta em cada card de evento ("Criar Relatório" / "Editar Relatório").
+  - Badges informativas de status ("Relatório Publicado" vs "Pendente").
+  - Preenchimento guiado com modelos automáticos (*Templates rápidos: Culto com Decisões, Congresso com Batismo, Ação Social*).
+  - Campos para métricas quantitativas de fé (Público, Decisões, Batismos).
+  - Inclusão dinâmica de múltiplos destaques e testemunho de fé.
+  - Upload / inclusão de links de fotos com galeria expansível.
+  - Registro de auditoria automática a cada criação ou exclusão de relatório.
+- **Portal Público (`EventsSection.tsx` & `EventReportModal.tsx`)**:
+  - Filtro exclusivo "Com Relatório" na grade de eventos.
+  - Tag visual nos eventos que possuem relatório registrado.
+  - Modal público rico com layout premium, cards de métricas, citação de testemunhos, carrossel de fotos, botão de compartilhamento no WhatsApp e impressão.
+
+### 3.2 Gestão Dinâmica de Logomarca
+- Suporte para duas variantes de logomarca:
+  1. **Logomarca Principal / Fundo Claro (`logoUrl`)**: Utilizada na Barra de Navegação Superior (Navbar) e nos Recibos de Dízimo/Oferta.
+  2. **Logomarca Fundo Escuro / Branca (`logoWhiteUrl`)**: Utilizada no Rodapé Institucional (Footer) e no Cabeçalho do Painel Administrativo.
+- Gerenciamento completo na aba **Configurações & Banco** com:
+  - Upload direto de arquivo local (com conversão para Data URI ou envio para o Storage).
+  - Campo para URL externa direta (ex.: CDN ou Imgur).
+  - Pré-visualização ao vivo em cards com contraste claro e escuro.
+  - Botão de redefinição para a logomarca vetorial original do sistema.
+
+### 3.3 Gestão Dinâmica do Hero Banner Principal
+- Permite alterar a imagem de fundo ou textura da primeira seção da página inicial:
+  - Presets visuais pré-definidos (Azul Profundo com Marca d'água, Gradiente Noturno, Luz Dourada, etc.).
+  - Upload de imagem personalizada de alta resolução ou link direto.
+  - Edição do Título Principal de Acolhimento (*"Por Que Servir a Deus e Cuidar de Vidas?"*) e do Subtítulo.
+  - Pré-visualização em tempo real dentro do painel administrativo.
+
+---
+
+## 🔒 4. Controle de Acesso e Segurança
+
+### 4.1 Níveis de Acesso por Função
 | Perfil | Permissões |
 | :--- | :--- |
-| **Pastor** (`pastor`) | Acesso total e irrestrito: Gabinete Pastoral, Livro Caixa completo, Gestão de Membros, Gestão de Usuários, Mídia, Cultos, Eventos, Criação/Gestão de Departamentos, Configurações do Banco e Logs de Auditoria. |
+| **Pastor** (`pastor`) | Acesso total e irrestrito: Gabinete Pastoral, Livro Caixa completo, Gestão de Membros, Gestão de Usuários, Mídia, Cultos, Eventos e Relatórios, Criação/Gestão de Departamentos, Configurações do Banco, Identidade Visual e Logs de Auditoria. |
 | **Tesoureiro** (`tesoureiro`) | Acesso ao Livro Caixa, Lançamento de Entradas/Saídas, Emissão de Recibos, Relatórios Financeiros, Cadastro de Membros Contribuintes, Gestão de Departamentos e Configurações. |
-| **Secretaria** (`secretaria`) | Gestão de Membros, Agenda de Cultos, Eventos, Galeria de Mídia, Pedidos de Oração, Criação/Gestão de Departamentos e Configurações. |
-| **Líder** (`lider`) | Gestão de Departamentos e Ministérios, Programação Semanal de Cultos, Inscrições em Eventos, Galeria de Mídia e Acesso às Configurações do Sistema. |
+| **Secretaria** (`secretaria`) | Gestão de Membros, Agenda de Cultos, Eventos e Relatórios Pós-Eventos, Galeria de Mídia, Pedidos de Oração, Criação/Gestão de Departamentos e Configurações. |
+| **Líder** (`lider`) | Gestão de Departamentos e Ministérios, Programação Semanal de Cultos, Inscrições e Relatórios em Eventos, Galeria de Mídia e Acesso às Configurações do Sistema. |
 
 > **Nota de Diretiva:** Conforme a regra do sistema, a aba de **Configurações & Banco** e o módulo de **Criação e Gestão de Departamentos** estão disponíveis para todos os usuários administrativos cadastrados.
 
-### 3.2 Modo Sigilo Pastoral
+### 4.2 Modo Sigilo Pastoral
 No módulo financeiro (`AdminFinancialCRM`), o recurso **Modo Sigilo** substitui instantaneamente os nomes de membros e dizimistas pelo respectivo código anônimo (`MBR-YYYY-XXX`), permitindo que tesoureiros trabalhem em telas compartilhadas ou projetores de assembleia sem expor valores nominais a terceiros.
 
 ---
 
-## 🚀 4. Guia de CI/CD e Deploy Contínuo
+## 🚀 5. Guia de CI/CD e Deploy Contínuo
 
-### 4.1 Estrutura do Workflow GitHub Actions (`.github/workflows/deploy.yml`)
+### 5.1 Estrutura do Workflow GitHub Actions (`.github/workflows/deploy.yml`)
 ```yaml
 name: Deploy to Hostinger via FTP
 
@@ -315,26 +375,39 @@ jobs:
         run: node deploy-ftp.js
 ```
 
-### 4.2 Script de Transferência FTP (`deploy-ftp.js`)
+### 5.2 Script de Transferência FTP (`deploy-ftp.js`)
 O script utiliza a biblioteca `basic-ftp` para realizar sincronização com proteção TLS (`explicit: true` e fallback para não criptografado se necessário), enviando os arquivos da pasta `dist/` diretamente para o diretório raiz `./` do servidor da Hostinger.
 
 ---
 
-## 🛠️ 5. Guia de Manutenção e Operação
+## 🛠️ 6. Guia de Manutenção e Operação
 
-### 5.1 Como Gerar Backup Manual
+### 6.1 Como Gerar Backup Manual
 No painel administrativo, acesse a aba **Configurações & Banco** e clique no botão **Backup JSON**. O sistema fará o download instantâneo de um snapshot completo com todas as 12 tabelas em formato JSON estruturado.
 
-### 5.2 Como Testar e Configurar Credenciais do Supabase
+### 6.2 Como Testar e Configurar Credenciais do Supabase
 1. No painel administrativo, vá em **Configurações & Banco**.
 2. Na seção **"Credenciais do Projeto Supabase"**, visualize ou altere a **URL da API** e a **Anon Key**.
 3. Clique em **"Salvar & Conectar Supabase"** para validar e persistir a conexão.
 4. Para retornar às configurações originais de fábrica do arquivo `.env`, clique em **"Restaurar Padrão do Sistema"**.
 5. Clique em **"Testar Conexão"** para validar a comunicação em tempo real com o PostgreSQL.
 
-### 5.3 Como Fazer Sincronização Forçada (Push / Pull)
-- **Push (Local > Supabase)**: Envia todos os cultos, eventos, departamentos, membros, mídias, pedidos de oração e livro caixa locais para o Supabase PostgreSQL.
-- **Pull (Supabase > Local)**: Puxa todos os dados atualizados do banco em nuvem Supabase e atualiza o estado deste navegador.
+### 6.3 Scripts de Migração no Supabase (Execução via SQL Editor)
+Caso você já possua um banco de dados ativo no Supabase, execute o script de migração abaixo para habilitar as novas colunas de relatórios, logomarca e hero banner:
+
+```sql
+-- Adicionar coluna de relatório na tabela de eventos
+ALTER TABLE public.church_events 
+ADD COLUMN IF NOT EXISTS report JSONB;
+
+-- Adicionar colunas de identidade visual e hero banner na tabela church_info
+ALTER TABLE public.church_info 
+ADD COLUMN IF NOT EXISTS logo_url TEXT,
+ADD COLUMN IF NOT EXISTS logo_white_url TEXT,
+ADD COLUMN IF NOT EXISTS hero_background_url TEXT,
+ADD COLUMN IF NOT EXISTS hero_title TEXT,
+ADD COLUMN IF NOT EXISTS hero_subtitle TEXT;
+```
 
 ---
 
@@ -342,4 +415,3 @@ No painel administrativo, acesse a aba **Configurações & Banco** e clique no b
 - **Empresa**: [Maximo Sistemas](https://maximosistemas.com)
 - **E-mail**: `obpcriolargo@gmail.com`
 - **Endereço Sede**: Loteamento 3 amigos, 3 - Forene, Rio Largo - AL
-

@@ -9,11 +9,14 @@ import {
   Sparkles, 
   CheckCircle, 
   ArrowRight,
-  Flame
+  Flame,
+  FileCheck,
+  FileText
 } from 'lucide-react';
 import { useChurch } from '../context/ChurchContext';
 import { ChurchEvent } from '../types';
 import { EventRegistrationModal } from './EventRegistrationModal';
+import { EventReportModal } from './EventReportModal';
 
 interface EventsSectionProps {
   onSelectEventForRegistration?: (event: ChurchEvent) => void;
@@ -22,12 +25,15 @@ interface EventsSectionProps {
 export const EventsSection: React.FC<EventsSectionProps> = ({ onSelectEventForRegistration }) => {
   const { events } = useChurch();
   const [selectedEventForReg, setSelectedEventForReg] = useState<ChurchEvent | null>(null);
+  const [selectedEventForReport, setSelectedEventForReport] = useState<ChurchEvent | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
 
-  const categories = ['Todos', 'Congresso', 'Missões', 'Vigília', 'Batismo'];
+  const categories = ['Todos', 'Congresso', 'Missões', 'Vigília', 'Batismo', 'Com Relatório'];
 
   const filteredEvents = selectedCategory === 'Todos'
     ? events
+    : selectedCategory === 'Com Relatório'
+    ? events.filter(e => Boolean(e.report))
     : events.filter(e => e.category === selectedCategory);
 
   const mainHighlight = events.find(e => e.highlight) || events[0];
@@ -184,6 +190,16 @@ export const EventsSection: React.FC<EventsSectionProps> = ({ onSelectEventForRe
                         Entrada Livre • Não necessita inscrição prévia
                       </div>
                     )}
+
+                    {mainHighlight.report && (
+                      <button
+                        onClick={() => setSelectedEventForReport(mainHighlight)}
+                        className="inline-flex items-center justify-center gap-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold text-xs uppercase tracking-wider px-4 py-3 rounded-lg transition-all"
+                      >
+                        <FileCheck className="w-4 h-4 text-amber-400" />
+                        <span>Ver Relatório</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -226,6 +242,13 @@ export const EventsSection: React.FC<EventsSectionProps> = ({ onSelectEventForRe
                 <span className="absolute top-3 left-3 text-[10px] font-bold uppercase tracking-wider bg-slate-900/80 text-white px-2.5 py-1 rounded">
                   {evt.category}
                 </span>
+
+                {evt.report && (
+                  <span className="absolute top-3 right-3 text-[10px] font-bold uppercase tracking-wider bg-amber-500 text-slate-950 px-2 py-0.5 rounded shadow flex items-center gap-1">
+                    <FileCheck className="w-3 h-3 fill-slate-950" />
+                    Relatório
+                  </span>
+                )}
               </div>
 
               <div className="p-5 flex-1 flex flex-col justify-between">
@@ -242,9 +265,22 @@ export const EventsSection: React.FC<EventsSectionProps> = ({ onSelectEventForRe
                     {evt.title}
                   </h4>
 
-                  <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4">
+                  <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-3">
                     {evt.description}
                   </p>
+
+                  {evt.report && (
+                    <div className="mb-4">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedEventForReport(evt)}
+                        className="w-full inline-flex items-center justify-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 py-1.5 px-3 rounded-lg transition-colors"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Ver Relatório do Evento</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="pt-3 border-t border-slate-200 flex items-center justify-between">
@@ -280,6 +316,14 @@ export const EventsSection: React.FC<EventsSectionProps> = ({ onSelectEventForRe
         <EventRegistrationModal
           event={selectedEventForReg}
           onClose={() => setSelectedEventForReg(null)}
+        />
+      )}
+
+      {/* Public Event Report Modal */}
+      {selectedEventForReport && (
+        <EventReportModal
+          event={selectedEventForReport}
+          onClose={() => setSelectedEventForReport(null)}
         />
       )}
     </section>

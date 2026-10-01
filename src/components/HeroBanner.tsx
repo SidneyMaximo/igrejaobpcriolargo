@@ -22,7 +22,10 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onNavigate }) => {
   return (
     <section 
       id="inicio" 
-      className="pt-24 lg:pt-28 bg-[#071d5e] bg-[url('/bg-obpc.svg')] bg-cover bg-center bg-no-repeat text-white min-h-[640px] lg:min-h-[720px] flex items-center relative overflow-hidden"
+      style={{
+        backgroundImage: `url('${churchInfo.heroBackgroundUrl || "/bg-obpc.svg"}')`
+      }}
+      className="pt-24 lg:pt-28 bg-[#071d5e] bg-cover bg-center bg-no-repeat text-white min-h-[640px] lg:min-h-[720px] flex items-center relative overflow-hidden"
     >
       {/* Subtle overlay to guarantee crisp text legibility while showing the watermark clearly */}
       <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-slate-950/40 to-slate-950/75 pointer-events-none" />
@@ -107,12 +110,12 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ onNavigate }) => {
 
             {/* Main Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight font-display drop-shadow-sm">
-              Por Que Servir a Deus e Cuidar de Vidas?
+              {churchInfo.heroTitle || 'Por Que Servir a Deus e Cuidar de Vidas?'}
             </h1>
 
             {/* Subtitle */}
             <p className="text-slate-200 text-base sm:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0 font-medium">
-              Somos uma comunidade viva dedicada ao Evangelho de Jesus Cristo, ao avivamento bíblico, à oração pelos enfermos e ao acolhimento amoroso de cada família.
+              {churchInfo.heroSubtitle || 'Somos uma comunidade viva dedicada ao Evangelho de Jesus Cristo, ao avivamento bíblico, à oração pelos enfermos e ao acolhimento amoroso de cada família.'}
             </p>
 
             {/* Main CTA Button */}

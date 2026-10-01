@@ -8,6 +8,11 @@ CREATE TABLE IF NOT EXISTS church_info (
   id TEXT PRIMARY KEY DEFAULT 'main',
   name TEXT NOT NULL DEFAULT 'Igreja O Brasil Para Cristo',
   subtitle TEXT DEFAULT 'Uma Família que Ama a Deus, Serve ao Próximo e Vive a Palavra',
+  logo_url TEXT DEFAULT '/obpc-logo.svg',
+  logo_white_url TEXT DEFAULT '/obpc-logo-white.svg',
+  hero_background_url TEXT DEFAULT '/bg-obpc.svg',
+  hero_title TEXT DEFAULT 'Por Que Servir a Deus e Cuidar de Vidas?',
+  hero_subtitle TEXT DEFAULT 'Somos uma comunidade viva dedicada ao Evangelho de Jesus Cristo, ao avivamento bíblico, à oração pelos enfermos e ao acolhimento amoroso de cada família.',
   pastor_name TEXT DEFAULT 'Pr. Janildo Manoel',
   vice_pastor_name TEXT DEFAULT '',
   address TEXT DEFAULT 'Loteamento 3 amigos, 3 - Forene',
@@ -29,6 +34,13 @@ CREATE TABLE IF NOT EXISTS church_info (
   history_text TEXT DEFAULT 'Fundada pelo missionário Manoel de Mello em 1956, a Igreja O Brasil Para Cristo é um ministério de fé, avivamento pentecostal, evangelização vibrante e profundo compromisso social.',
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
+
+-- Migração rápida se a tabela church_info já existir no Supabase:
+ALTER TABLE church_info ADD COLUMN IF NOT EXISTS logo_url TEXT DEFAULT '/obpc-logo.svg';
+ALTER TABLE church_info ADD COLUMN IF NOT EXISTS logo_white_url TEXT DEFAULT '/obpc-logo-white.svg';
+ALTER TABLE church_info ADD COLUMN IF NOT EXISTS hero_background_url TEXT DEFAULT '/bg-obpc.svg';
+ALTER TABLE church_info ADD COLUMN IF NOT EXISTS hero_title TEXT DEFAULT 'Por Que Servir a Deus e Cuidar de Vidas?';
+ALTER TABLE church_info ADD COLUMN IF NOT EXISTS hero_subtitle TEXT;
 
 -- 2. Programações Semanais dos Cultos
 CREATE TABLE IF NOT EXISTS weekly_schedules (
@@ -64,8 +76,12 @@ CREATE TABLE IF NOT EXISTS church_events (
   registered_count INTEGER DEFAULT 0,
   guest_speaker TEXT,
   musical_guest TEXT,
+  report JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
+
+-- Migração rápida se a tabela já existir no Supabase:
+ALTER TABLE church_events ADD COLUMN IF NOT EXISTS report JSONB;
 
 -- 4. Inscrições nos Eventos
 CREATE TABLE IF NOT EXISTS event_registrations (

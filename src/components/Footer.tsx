@@ -46,9 +46,11 @@ export const Footer: React.FC<FooterProps> = ({ onOpenAdminLogin, onNavigate }) 
           {/* Col 1: Brand & Historic Statement */}
           <div className="lg:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#70b83b]/20 flex items-center justify-center text-[#70b83b] border border-[#70b83b]/40">
-                <Church className="w-5 h-5" />
-              </div>
+              <img 
+                src={churchInfo.logoWhiteUrl || churchInfo.logoUrl || "/obpc-logo-white.svg"} 
+                alt={churchInfo.name || "Igreja O Brasil Para Cristo"} 
+                className="h-10 sm:h-12 w-auto object-contain"
+              />
               <div>
                 <span className="font-serif font-bold text-white text-base tracking-wide block uppercase">
                   {churchInfo.name || 'O Brasil Para Cristo'}

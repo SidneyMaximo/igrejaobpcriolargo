@@ -78,13 +78,15 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onBackToPublicSite }) 
             </button>
 
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <Church className="w-5 h-5" />
-              </div>
-              <div>
+              <img
+                src={churchInfo.logoWhiteUrl || churchInfo.logoUrl || "/obpc-logo-white.svg"}
+                alt="Logo"
+                className="h-8 sm:h-9 w-auto object-contain max-w-[130px]"
+              />
+              <div className="hidden sm:block">
                 <h1 className="font-serif font-bold text-sm sm:text-base text-white flex items-center gap-2">
-                  <span>OBPC • Painel Pastoral & CRM</span>
-                  <span className="hidden sm:inline-block text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                  <span>Painel Pastoral & CRM</span>
+                  <span className="hidden md:inline-block text-[10px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full">
                     Acesso Seguro
                   </span>
                 </h1>

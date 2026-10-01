@@ -108,6 +108,11 @@ CREATE TABLE IF NOT EXISTS church_info (
   id TEXT PRIMARY KEY DEFAULT 'main',
   name TEXT NOT NULL DEFAULT 'Igreja O Brasil Para Cristo',
   subtitle TEXT DEFAULT 'Uma Família que Ama a Deus, Serve ao Próximo e Vive a Palavra',
+  logo_url TEXT DEFAULT '/obpc-logo.svg',
+  logo_white_url TEXT DEFAULT '/obpc-logo-white.svg',
+  hero_background_url TEXT DEFAULT '/bg-obpc.svg',
+  hero_title TEXT DEFAULT 'Por Que Servir a Deus e Cuidar de Vidas?',
+  hero_subtitle TEXT DEFAULT 'Somos uma comunidade viva dedicada ao Evangelho de Jesus Cristo, ao avivamento bíblico, à oração pelos enfermos e ao acolhimento amoroso de cada família.',
   pastor_name TEXT DEFAULT 'Pr. Janildo Manoel',
   vice_pastor_name TEXT DEFAULT '',
   address TEXT DEFAULT 'Loteamento 3 amigos, 3 - Forene',
@@ -164,6 +169,7 @@ CREATE TABLE IF NOT EXISTS church_events (
   registered_count INTEGER DEFAULT 0,
   guest_speaker TEXT,
   musical_guest TEXT,
+  report JSONB,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
@@ -409,6 +415,11 @@ export const toChurchInfo = (row: any): ChurchInfo => {
   return {
     name: row.name || 'Igreja O Brasil Para Cristo',
     subtitle: row.subtitle || '',
+    logoUrl: row.logo_url || '/obpc-logo.svg',
+    logoWhiteUrl: row.logo_white_url || '/obpc-logo-white.svg',
+    heroBackgroundUrl: row.hero_background_url || '/bg-obpc.svg',
+    heroTitle: row.hero_title || 'Por Que Servir a Deus e Cuidar de Vidas?',
+    heroSubtitle: row.hero_subtitle || 'Somos uma comunidade viva dedicada ao Evangelho de Jesus Cristo, ao avivamento bíblico, à oração pelos enfermos e ao acolhimento amoroso de cada família.',
     pastorName,
     vicePastorName: row.vice_pastor_name || '',
     address,
@@ -435,6 +446,11 @@ export const fromChurchInfo = (info: ChurchInfo) => ({
   id: 'main',
   name: info.name,
   subtitle: info.subtitle,
+  logo_url: info.logoUrl || null,
+  logo_white_url: info.logoWhiteUrl || null,
+  hero_background_url: info.heroBackgroundUrl || null,
+  hero_title: info.heroTitle || null,
+  hero_subtitle: info.heroSubtitle || null,
   pastor_name: info.pastorName,
   vice_pastor_name: info.vicePastorName,
   address: info.address,
@@ -501,7 +517,18 @@ export const toEvent = (row: any): ChurchEvent => ({
   registrationLimit: row.registration_limit || undefined,
   registeredCount: row.registered_count || 0,
   guestSpeaker: row.guest_speaker || undefined,
-  musicalGuest: row.musical_guest || undefined
+  musicalGuest: row.musical_guest || undefined,
+  report: row.report
+    ? typeof row.report === 'string'
+      ? (() => {
+          try {
+            return JSON.parse(row.report);
+          } catch {
+            return { summary: row.report };
+          }
+        })()
+      : row.report
+    : undefined
 });
 
 export const fromEvent = (e: ChurchEvent) => ({
@@ -520,7 +547,8 @@ export const fromEvent = (e: ChurchEvent) => ({
   registration_limit: e.registrationLimit || null,
   registered_count: e.registeredCount || 0,
   guest_speaker: e.guestSpeaker || null,
-  musical_guest: e.musicalGuest || null
+  musical_guest: e.musicalGuest || null,
+  report: e.report || null
 });
 
 export const toMediaFolder = (row: any): MediaFolder => ({
