@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS public.event_registrations (
 ```
 
 ### 2.5 Tabela `church_departments` (Departamentos & Ministérios da Igreja)
-Gerencia todos os ministérios oficiais e departamentais da igreja (JUBRAC, UFEBRAC, MENBRAC, UCEBRAC, ADOBRAC, Louvor, etc.).
+Gerencia todos os ministérios oficiais e departamentais da igreja (JUBRAC, UFEBRAC, HUMASBRAC, MENIBRAC, ADOBRAC, Louvor, etc.).
 ```sql
 CREATE TABLE IF NOT EXISTS public.church_departments (
   id TEXT PRIMARY KEY,

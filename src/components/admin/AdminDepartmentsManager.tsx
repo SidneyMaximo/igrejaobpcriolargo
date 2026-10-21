@@ -279,7 +279,7 @@ export const AdminDepartmentsManager: React.FC = () => {
             Gestão & Criação de Departamentos e Ministérios
           </h3>
           <p className="text-xs text-slate-400 mt-1">
-            Cadastre novos departamentos da igreja (JUBRAC, UFEBRAC, MENBRAC, Louvor, etc.) com líderes, horários e cores personalizadas.
+            Cadastre novos departamentos da igreja (JUBRAC, UFEBRAC, HUMASBRAC, MENIBRAC, ADOBRAC, Louvor, etc.) com líderes, horários e cores personalizadas.
           </p>
         </div>
 

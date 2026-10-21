@@ -24,7 +24,7 @@ Desenvolvido por [maximosistemas.com](https://maximosistemas.com).
 
 ### 🌐 Portal Público
 - **Hero & Identidade Visual**: Logomarca oficial da OBPC com alta fidelidade, versículos diários e chamada para cultos.
-- **Agenda de Cultos & Eventos**: Programação semanal, cultos departamentais (JUBRAC, UFEBRAC, MENBRAC, UCEBRAC) e inscrições em conferências.
+- **Agenda de Cultos & Eventos**: Programação semanal, cultos departamentais (JUBRAC, UFEBRAC, HUMASBRAC, MENIBRAC, ADOBRAC) e inscrições em conferências.
 - **Galeria Multimídia**: Álbuns de fotos e vídeos integrados ao canal oficial do YouTube e Instagram.
 - **Gabinete de Oração Online**: Formulário público para envio de pedidos de oração (com opção de sigilo exclusivo pastoral).
 - **Dízimos e Ofertas (PIX)**: Copia e cola de chave PIX, QR Code dinâmico e dados bancários institucionais.
@@ -156,7 +156,7 @@ O sistema utiliza PostgreSQL no Supabase com suporte a Realtime. As 12 tabelas o
 | `weekly_schedules` | Horários e detalhes da programação semanal de cultos |
 | `church_events` | Eventos, conferências, congressos e programações especiais |
 | `event_registrations` | Inscrições de fiéis nos eventos e conferências da igreja |
-| `church_departments` | Gestão de Departamentos & Ministérios (JUBRAC, UFEBRAC, MENBRAC, UCEBRAC, ADOBRAC, Louvor) |
+| `church_departments` | Gestão de Departamentos & Ministérios (JUBRAC, UFEBRAC, HUMASBRAC, MENIBRAC, ADOBRAC, Louvor) |
 | `media_folders` | Pastas de categorização de álbuns de fotos e vídeos |
 | `media_items` | Links e fotos/vídeos da galeria da igreja |
 | `prayer_requests` | Pedidos de oração públicos e confidenciais |

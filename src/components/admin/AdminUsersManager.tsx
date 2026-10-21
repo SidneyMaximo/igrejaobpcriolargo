@@ -197,7 +197,7 @@ export const AdminUsersManager: React.FC = () => {
             <Shield className="w-4 h-4" />
             <span>Pastor Titular</span>
           </div>
-          <p className="text-[11px] text-slate-400">Acesso completo: finanças, membros, departamentos, cultos, eventos e configurações do banco.</p>
+          <p className="text-[11px] text-slate-400">Acesso completo: finanças, membros, departamentos, cultos, eventos e configurações gerais da igreja.</p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3.5">

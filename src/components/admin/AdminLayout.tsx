@@ -8,7 +8,7 @@ import {
   Image as ImageIcon, 
   DollarSign, 
   Heart, 
-  Database, 
+  Settings, 
   LogOut, 
   ArrowLeft, 
   ShieldCheck, 
@@ -53,7 +53,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onBackToPublicSite }) 
     { id: 'oracao', label: 'Gabinete de Oração', icon: Heart, count: pendingPrayers },
     { id: 'usuarios', label: 'Usuários & Senhas', icon: Users, badge: `${users.length}` },
     { id: 'logs', label: 'Auditoria & Logs', icon: ShieldAlert, badge: `${auditLogs.length}` },
-    { id: 'supabase', label: 'Configurações & Banco', icon: Database }
+    { id: 'supabase', label: 'Configurações Gerais', icon: Settings }
   ];
 
   const handleLogout = () => {

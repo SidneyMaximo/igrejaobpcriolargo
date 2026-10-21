@@ -83,10 +83,10 @@ export const HistorySection: React.FC = () => {
       shortDesc: 'Mais de 4.000 congregações, convenções estaduais e campos no exterior.',
       tag: 'Expansão & Futuro',
       icon: Globe2,
-      content: `Após o jubileu e o falecimento do missionário Manoel de Mello em maio de 1990, a Igreja O Brasil Para Cristo manteve sua solidez institucional através da Convenção Nacional (CONAMI / Conselho Nacional), das Convenções Estaduais e dos seus respeitados departamentos (JUBRAC, UFEBRAC, MENBRAC, UCEBRAC). Hoje a OBPC possui milhares de templos no Brasil, projetos sociais, creches, colégios teológicos e frentes missionárias na América Latina, África e Europa.`,
+      content: `Após o jubileu e o falecimento do missionário Manoel de Mello em maio de 1990, a Igreja O Brasil Para Cristo manteve sua solidez institucional através da Convenção Nacional (CONAMI / Conselho Nacional), das Convenções Estaduais e dos seus respeitados departamentos (JUBRAC, UFEBRAC, HUMASBRAC, MENIBRAC, ADOBRAC). Hoje a OBPC possui milhares de templos no Brasil, projetos sociais, creches, colégios teológicos e frentes missionárias na América Latina, África e Europa.`,
       highlights: [
         'Milhares de templos e congregações em todos os estados brasileiros',
-        'Departamentos ativos: JUBRAC (Jovens), UFEBRAC (Mulheres), MENBRAC (Homens)',
+        'Departamentos ativos: JUBRAC (Jovens), UFEBRAC (Mulheres), HUMASBRAC (Homens), MENIBRAC (Crianças), ADOBRAC (Adolescentes)',
         'Campos de missões transculturais em múltiplos continentes'
       ]
     }

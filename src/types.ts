@@ -182,7 +182,7 @@ export interface FinancialSummary {
 // ==============================================================================
 export interface ChurchDepartment {
   id: string;
-  code: string; // Ex: 'JUBRAC', 'UFEBRAC', 'MENBRAC', 'UCEBRAC', 'ADOBRAC'
+  code: string; // Ex: 'JUBRAC', 'UFEBRAC', 'HUMASBRAC', 'MENIBRAC', 'ADOBRAC'
   name: string; // Ex: 'JUBRAC (Juventude)'
   description: string;
   leader: string;

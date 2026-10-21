@@ -348,7 +348,8 @@ INSERT INTO church_departments (
 ) VALUES 
   ('dep-1', 'JUBRAC', 'JUBRAC (Juventude)', 'Juventude da Igreja O Brasil Para Cristo. Evangelismo, louvor jovem e comunhão.', 'Liderança JUBRAC', 'Sábados às 19:30', 'amber', 'sparkles', true, 1),
   ('dep-2', 'UFEBRAC', 'UFEBRAC (Mulheres)', 'União Feminina da OBPC. Círculo de oração, intercessão e assistência social.', 'Liderança UFEBRAC', 'Terças às 19:30', 'rose', 'heart', true, 2),
-  ('dep-3', 'MENBRAC', 'MENBRAC (Homens)', 'Ministério de Homens. Fortalecimento espiritual, sacerdócio no lar e liderança bíblica.', 'Liderança MENBRAC', 'Quartas às 19:30', 'blue', 'shield', true, 3),
-  ('dep-4', 'UCEBRAC', 'UCEBRAC (Crianças)', 'União de Crianças da OBPC. Culto infantil e formação bíblica dos pequeninos.', 'Liderança UCEBRAC', 'Domingos às 09:00', 'emerald', 'users', true, 4),
-  ('dep-5', 'ADOBRAC', 'ADOBRAC (Adolescentes)', 'Adolescentes da OBPC. Discipulado bíblico, música e eventos de integração.', 'Liderança ADOBRAC', 'Quartas às 19:30', 'purple', 'zap', true, 5)
+  ('dep-3', 'HUMASBRAC', 'HUMASBRAC (Homens)', 'Homens Unidos Mais que Vencedores de O Brasil Para Cristo. Fortalecimento espiritual, sacerdócio no lar e liderança bíblica.', 'Liderança HUMASBRAC', 'Quartas às 19:30', 'blue', 'shield', true, 3),
+  ('dep-4', 'MENIBRAC', 'MENIBRAC (Crianças)', 'Meninos e Meninas de O Brasil Para Cristo. Culto infantil e formação bíblica dos pequeninos.', 'Liderança MENIBRAC', 'Domingos às 09:00', 'amber', 'sparkles', true, 4),
+  ('dep-5', 'ADOBRAC', 'ADOBRAC (Adolescentes)', 'Adolescentes de O Brasil Para Cristo. Discipulado bíblico, música e eventos de integração.', 'Liderança ADOBRAC', 'Quartas às 19:30', 'purple', 'zap', true, 5),
+  ('dep-6', 'LOUVOR', 'Ministério de Louvor & Adoração', 'Banda, vocal e instrumentistas dedicados a conduzir a igreja em adoração.', 'Ministério de Louvor', 'Sábados às 17:00', 'sky', 'music', true, 6)
 ON CONFLICT (id) DO NOTHING;

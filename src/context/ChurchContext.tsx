@@ -222,7 +222,28 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [events, setEvents] = useState<ChurchEvent[]>(() => safeParse(STORAGE_KEYS.EVENTS, INITIAL_EVENTS));
 
   // 3.1 Departments & Ministérios
-  const [departments, setDepartments] = useState<ChurchDepartment[]>(() => safeParse(STORAGE_KEYS.DEPARTMENTS, INITIAL_DEPARTMENTS));
+  const [departments, setDepartments] = useState<ChurchDepartment[]>(() => {
+    const list = safeParse<ChurchDepartment[]>(STORAGE_KEYS.DEPARTMENTS, INITIAL_DEPARTMENTS);
+    return list.map(d => {
+      if (d.code === 'MENBRAC') {
+        return {
+          ...d,
+          code: 'HUMASBRAC',
+          name: d.name.replace('MENBRAC', 'HUMASBRAC'),
+          leader: d.leader?.replace('MENBRAC', 'HUMASBRAC') || 'Liderança HUMASBRAC'
+        };
+      }
+      if (d.code === 'UCEBRAC') {
+        return {
+          ...d,
+          code: 'MENIBRAC',
+          name: d.name.replace('UCEBRAC', 'MENIBRAC'),
+          leader: d.leader?.replace('UCEBRAC', 'MENIBRAC') || 'Liderança MENIBRAC'
+        };
+      }
+      return d;
+    });
+  });
 
   // 4. Media Folders & Items
   const [mediaFolders, setMediaFolders] = useState<MediaFolder[]>(() => safeParse(STORAGE_KEYS.FOLDERS, INITIAL_MEDIA_FOLDERS));
@@ -403,7 +424,22 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             info.email = 'obpcriolargo@gmail.com';
             supabaseService.updateChurchInfo(info);
           }
-          setChurchInfo(info);
+          setChurchInfo(prev => {
+            const hasCustomLocalLogo = prev.logoUrl && prev.logoUrl !== '/obpc-logo.svg';
+            const hasCustomLocalLogoWhite = prev.logoWhiteUrl && prev.logoWhiteUrl !== '/obpc-logo-white.svg';
+            const hasCustomLocalHeroBg = prev.heroBackgroundUrl && prev.heroBackgroundUrl !== '/bg-obpc.svg';
+            const hasCustomLocalHeroTitle = prev.heroTitle && prev.heroTitle !== 'Por Que Servir a Deus e Cuidar de Vidas?';
+
+            return {
+              ...prev,
+              ...info,
+              logoUrl: (info.logoUrl && info.logoUrl !== '/obpc-logo.svg') ? info.logoUrl : (hasCustomLocalLogo ? prev.logoUrl : info.logoUrl),
+              logoWhiteUrl: (info.logoWhiteUrl && info.logoWhiteUrl !== '/obpc-logo-white.svg') ? info.logoWhiteUrl : (hasCustomLocalLogoWhite ? prev.logoWhiteUrl : info.logoWhiteUrl),
+              heroBackgroundUrl: (info.heroBackgroundUrl && info.heroBackgroundUrl !== '/bg-obpc.svg') ? info.heroBackgroundUrl : (hasCustomLocalHeroBg ? prev.heroBackgroundUrl : info.heroBackgroundUrl),
+              heroTitle: (info.heroTitle && info.heroTitle !== 'Por Que Servir a Deus e Cuidar de Vidas?') ? info.heroTitle : (hasCustomLocalHeroTitle ? prev.heroTitle : info.heroTitle),
+              heroSubtitle: info.heroSubtitle || prev.heroSubtitle
+            };
+          });
         }
         if (data.schedules && data.schedules.length > 0) setSchedules(data.schedules);
         if (data.events && data.events.length > 0) setEvents(data.events);
@@ -592,9 +628,11 @@ export const ChurchProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
   // Methods
   const updateChurchInfo = (info: Partial<ChurchInfo>) => {
-    const updated = { ...churchInfo, ...info };
-    setChurchInfo(updated);
-    supabaseService.updateChurchInfo(updated);
+    setChurchInfo(prev => {
+      const updated = { ...prev, ...info };
+      supabaseService.updateChurchInfo(updated);
+      return updated;
+    });
     addAuditLog('Dados da Igreja Atualizados', 'CONFIGURACAO', `Atualizados dados institucionais / PIX.`);
   };
 

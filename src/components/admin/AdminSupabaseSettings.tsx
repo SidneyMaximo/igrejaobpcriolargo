@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Database, 
+  Settings,
   Check, 
   Download, 
   RefreshCw, 
@@ -15,12 +16,15 @@ import {
   Upload,
   RotateCcw,
   Sparkles,
-  Eye
+  Eye,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { useChurch } from '../../context/ChurchContext';
 import { supabaseStorageService } from '../../lib/supabase';
 
 export const AdminSupabaseSettings: React.FC = () => {
+  const [showDevDatabaseTools, setShowDevDatabaseTools] = useState(false);
   const { 
     schedules, 
     events, 
@@ -294,11 +298,11 @@ export const AdminSupabaseSettings: React.FC = () => {
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h3 className="text-xl font-bold text-white flex items-center gap-2">
-            <Database className="w-5 h-5 text-amber-400" />
-            Configurações &amp; Banco de Dados
+            <Settings className="w-5 h-5 text-amber-400" />
+            Configurações Gerais da Igreja
           </h3>
           <p className="text-xs text-slate-400 mt-1">
-            Persistência em nuvem PostgreSQL em tempo real, sincronização e dados cadastrais da igreja.
+            Personalização da logomarca oficial, banners, dados pastorais, contatos e chave PIX da congregação.
           </p>
         </div>
 
@@ -310,171 +314,6 @@ export const AdminSupabaseSettings: React.FC = () => {
             <Download className="w-4 h-4 text-amber-400" />
             <span>Backup JSON</span>
           </button>
-        </div>
-      </div>
-
-      {/* Supabase Status & Sync Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow space-y-6">
-        
-        {/* Status Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
-          <div className="flex items-center gap-3">
-            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center ${
-              supabaseStatus === 'connected' 
-                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
-                : supabaseStatus === 'checking'
-                ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
-                : supabaseStatus === 'error'
-                ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
-                : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-            }`}>
-              <Database className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h4 className="font-bold text-white text-base">Status da Conexão Supabase</h4>
-                <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 ${
-                  supabaseStatus === 'connected'
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                    : supabaseStatus === 'checking'
-                    ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
-                    : supabaseStatus === 'error'
-                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-                    : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                }`}>
-                  <span className={`w-2 h-2 rounded-full ${
-                    supabaseStatus === 'connected' ? 'bg-emerald-400 animate-pulse' :
-                    supabaseStatus === 'checking' ? 'bg-sky-400 animate-ping' :
-                    supabaseStatus === 'error' ? 'bg-rose-400' : 'bg-amber-400'
-                  }`} />
-                  <span>
-                    {supabaseStatus === 'connected' ? 'Conectado (Online)' :
-                     supabaseStatus === 'checking' ? 'Verificando...' :
-                     supabaseStatus === 'error' ? 'Erro na Conexão' : 'Modo Offline / Local'}
-                  </span>
-                </span>
-              </div>
-              <p className="text-xs text-slate-400 mt-0.5">{supabaseStatusMessage}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleTestConnection}
-              disabled={testingConnection}
-              className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-700 transition-all disabled:opacity-50 shadow"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${testingConnection ? 'animate-spin' : ''}`} />
-              <span>Testar Conexão</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Feedback Alert */}
-        {feedbackMsg && (
-          <div className={`p-3 rounded-xl text-xs flex items-center justify-between gap-2 border ${
-            feedbackMsg.type === 'success' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' :
-            feedbackMsg.type === 'error' ? 'bg-rose-500/10 text-rose-300 border-rose-500/30' :
-            'bg-sky-500/10 text-sky-300 border-sky-500/30'
-          }`}>
-            <div className="flex items-center gap-2">
-              {feedbackMsg.type === 'success' ? <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
-              <span>{feedbackMsg.text}</span>
-            </div>
-            <button 
-              onClick={() => setFeedbackMsg(null)}
-              className="text-[11px] opacity-70 hover:opacity-100 uppercase font-mono font-bold"
-            >
-              Fechar
-            </button>
-          </div>
-        )}
-
-        {/* Elegant Infrastructure Notice */}
-        <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 sm:p-6 space-y-4">
-          <div className="flex items-start sm:items-center gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <h5 className="text-sm font-bold text-white flex items-center gap-2">
-                <span>Infraestrutura e Segurança de Dados</span>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  Gerenciamento Seguro
-                </span>
-              </h5>
-              <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                As configurações de banco de dados e credenciais do Supabase agora são injetadas automaticamente de forma segura pelo servidor durante a construção do sistema. Nenhuma ação manual é necessária.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-800/80 text-xs">
-            <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center gap-2.5">
-              <Lock className="w-4 h-4 text-emerald-400 shrink-0" />
-              <div>
-                <span className="text-[10px] text-slate-400 block">Ambiente</span>
-                <span className="text-slate-200 font-semibold truncate block">Injeção Automática de Secrets</span>
-              </div>
-            </div>
-            <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center gap-2.5">
-              <ShieldCheck className="w-4 h-4 text-sky-400 shrink-0" />
-              <div>
-                <span className="text-[10px] text-slate-400 block">Comunicação</span>
-                <span className="text-slate-200 font-semibold truncate block">Criptografia SSL/TLS Ativa</span>
-              </div>
-            </div>
-            <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center gap-2.5">
-              <Database className="w-4 h-4 text-amber-400 shrink-0" />
-              <div>
-                <span className="text-[10px] text-slate-400 block">Banco de Dados</span>
-                <span className="text-slate-200 font-semibold truncate block">PostgreSQL Supabase</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Sincronização Push / Pull */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between">
-            <div>
-              <h5 className="text-xs font-bold text-white flex items-center gap-2">
-                <UploadCloud className="w-4 h-4 text-emerald-400" />
-                <span>Enviar Dados Locais para o Supabase (Push)</span>
-              </h5>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Envia todos os cultos, eventos, membros, fotos e financeiro locais para sincronizar com o Supabase.
-              </p>
-            </div>
-            <button
-              onClick={handlePushData}
-              disabled={isSyncing || supabaseStatus !== 'connected'}
-              className="mt-3 inline-flex items-center justify-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold px-4 py-2 rounded-xl transition-all disabled:opacity-40"
-            >
-              {isSyncing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
-              <span>Sincronizar Local &gt; Supabase</span>
-            </button>
-          </div>
-
-          <div className="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between">
-            <div>
-              <h5 className="text-xs font-bold text-white flex items-center gap-2">
-                <DownloadCloud className="w-4 h-4 text-sky-400" />
-                <span>Puxar Dados do Supabase para o Sistema (Pull)</span>
-              </h5>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Recarrega todas as informações do banco em nuvem Supabase e atualiza o estado deste navegador.
-              </p>
-            </div>
-            <button
-              onClick={handlePullData}
-              disabled={isSyncing || supabaseStatus !== 'connected'}
-              className="mt-3 inline-flex items-center justify-center gap-2 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/30 text-xs font-bold px-4 py-2 rounded-xl transition-all disabled:opacity-40"
-            >
-              {isSyncing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <DownloadCloud className="w-3.5 h-3.5" />}
-              <span>Atualizar do Supabase &gt; Local</span>
-            </button>
-          </div>
         </div>
       </div>
 
@@ -1202,6 +1041,184 @@ export const AdminSupabaseSettings: React.FC = () => {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Seção Técnica de Banco de Dados (Oculta por padrão para evitar erros do cliente) */}
+      <div className="pt-8 border-t border-slate-800/60 flex flex-col items-center">
+        <button
+          type="button"
+          onClick={() => setShowDevDatabaseTools(!showDevDatabaseTools)}
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-500 hover:text-slate-300 hover:bg-slate-900/60 transition-all border border-transparent hover:border-slate-800"
+        >
+          <Lock className="w-3.5 h-3.5 text-slate-500" />
+          <span>{showDevDatabaseTools ? 'Ocultar Opções Avançadas de Banco de Dados' : 'Opções Avançadas de Banco de Dados (Técnico)'}</span>
+          {showDevDatabaseTools ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+        </button>
+
+        {showDevDatabaseTools && (
+          <div className="w-full mt-6 bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow space-y-6 animate-in fade-in">
+            {/* Status Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className={`w-11 h-11 rounded-2xl flex items-center justify-center ${
+                  supabaseStatus === 'connected' 
+                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
+                    : supabaseStatus === 'checking'
+                    ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20'
+                    : supabaseStatus === 'error'
+                    ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                    : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                }`}>
+                  <Database className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-bold text-white text-base">Status da Conexão Supabase</h4>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 ${
+                      supabaseStatus === 'connected'
+                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                        : supabaseStatus === 'checking'
+                        ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                        : supabaseStatus === 'error'
+                        ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                    }`}>
+                      <span className={`w-2 h-2 rounded-full ${
+                        supabaseStatus === 'connected' ? 'bg-emerald-400 animate-pulse' :
+                        supabaseStatus === 'checking' ? 'bg-sky-400 animate-ping' :
+                        supabaseStatus === 'error' ? 'bg-rose-400' : 'bg-amber-400'
+                      }`} />
+                      <span>
+                        {supabaseStatus === 'connected' ? 'Conectado (Online)' :
+                         supabaseStatus === 'checking' ? 'Verificando...' :
+                         supabaseStatus === 'error' ? 'Erro na Conexão' : 'Modo Offline / Local'}
+                      </span>
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 mt-0.5">{supabaseStatusMessage}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleTestConnection}
+                  disabled={testingConnection}
+                  className="inline-flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3.5 py-2 rounded-xl text-xs font-semibold border border-slate-700 transition-all disabled:opacity-50 shadow"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 text-amber-400 ${testingConnection ? 'animate-spin' : ''}`} />
+                  <span>Testar Conexão</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Feedback Alert */}
+            {feedbackMsg && (
+              <div className={`p-3 rounded-xl text-xs flex items-center justify-between gap-2 border ${
+                feedbackMsg.type === 'success' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' :
+                feedbackMsg.type === 'error' ? 'bg-rose-500/10 text-rose-300 border-rose-500/30' :
+                'bg-sky-500/10 text-sky-300 border-sky-500/30'
+              }`}>
+                <div className="flex items-center gap-2">
+                  {feedbackMsg.type === 'success' ? <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> : <AlertCircle className="w-4 h-4 flex-shrink-0" />}
+                  <span>{feedbackMsg.text}</span>
+                </div>
+                <button 
+                  onClick={() => setFeedbackMsg(null)}
+                  className="text-[11px] opacity-70 hover:opacity-100 uppercase font-mono font-bold"
+                >
+                  Fechar
+                </button>
+              </div>
+            )}
+
+            {/* Infrastructure Notice */}
+            <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 sm:p-6 space-y-4">
+              <div className="flex items-start sm:items-center gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div>
+                  <h5 className="text-sm font-bold text-white flex items-center gap-2">
+                    <span>Infraestrutura e Segurança de Dados</span>
+                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      Gerenciamento Seguro
+                    </span>
+                  </h5>
+                  <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
+                    As configurações de banco de dados e credenciais do Supabase são injetadas automaticamente pelo servidor.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-800/80 text-xs">
+                <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center gap-2.5">
+                  <Lock className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <div>
+                    <span className="text-[10px] text-slate-400 block">Ambiente</span>
+                    <span className="text-slate-200 font-semibold truncate block">Injeção Automática de Secrets</span>
+                  </div>
+                </div>
+                <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center gap-2.5">
+                  <ShieldCheck className="w-4 h-4 text-sky-400 shrink-0" />
+                  <div>
+                    <span className="text-[10px] text-slate-400 block">Comunicação</span>
+                    <span className="text-slate-200 font-semibold truncate block">Criptografia SSL/TLS Ativa</span>
+                  </div>
+                </div>
+                <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-800 flex items-center gap-2.5">
+                  <Database className="w-4 h-4 text-amber-400 shrink-0" />
+                  <div>
+                    <span className="text-[10px] text-slate-400 block">Banco de Dados</span>
+                    <span className="text-slate-200 font-semibold truncate block">PostgreSQL Supabase</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sincronização Push / Pull */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                <div>
+                  <h5 className="text-xs font-bold text-white flex items-center gap-2">
+                    <UploadCloud className="w-4 h-4 text-emerald-400" />
+                    <span>Enviar Dados Locais para o Supabase (Push)</span>
+                  </h5>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Envia todos os cultos, eventos, membros, fotos e financeiro locais para sincronizar com o Supabase.
+                  </p>
+                </div>
+                <button
+                  onClick={handlePushData}
+                  disabled={isSyncing || supabaseStatus !== 'connected'}
+                  className="mt-3 inline-flex items-center justify-center gap-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold px-4 py-2 rounded-xl transition-all disabled:opacity-40"
+                >
+                  {isSyncing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
+                  <span>Sincronizar Local &gt; Supabase</span>
+                </button>
+              </div>
+
+              <div className="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                <div>
+                  <h5 className="text-xs font-bold text-white flex items-center gap-2">
+                    <DownloadCloud className="w-4 h-4 text-sky-400" />
+                    <span>Puxar Dados do Supabase para o Sistema (Pull)</span>
+                  </h5>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Recarrega todas as informações do banco em nuvem Supabase e atualiza o estado deste navegador.
+                  </p>
+                </div>
+                <button
+                  onClick={handlePullData}
+                  disabled={isSyncing || supabaseStatus !== 'connected'}
+                  className="mt-3 inline-flex items-center justify-center gap-2 bg-sky-500/10 hover:bg-sky-500/20 text-sky-300 border border-sky-500/30 text-xs font-bold px-4 py-2 rounded-xl transition-all disabled:opacity-40"
+                >
+                  {isSyncing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <DownloadCloud className="w-3.5 h-3.5" />}
+                  <span>Atualizar do Supabase &gt; Local</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
     </div>

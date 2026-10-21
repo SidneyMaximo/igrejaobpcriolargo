@@ -953,10 +953,36 @@ export const supabaseService = {
   },
 
   // CRUD Granulares
-  async updateChurchInfo(info: ChurchInfo) {
+  async updateChurchInfo(info: ChurchInfo): Promise<{ success: boolean; message?: string }> {
     const client = getSupabase();
-    if (!client) return;
-    await client.from('church_info').upsert(fromChurchInfo(info));
+    if (!client) return { success: false, message: 'Supabase não conectado' };
+    
+    const payload = fromChurchInfo(info);
+    const { error } = await client.from('church_info').upsert(payload);
+    
+    if (error) {
+      console.warn('Aviso ao atualizar church_info no Supabase:', error);
+      // Fallback resiliente: se a tabela no Supabase ainda não tiver as colunas de logo/banner
+      if (error.code === 'PGRST204' || error.message?.includes('column')) {
+        const fallbackPayload: any = { ...payload };
+        delete fallbackPayload.logo_url;
+        delete fallbackPayload.logo_white_url;
+        delete fallbackPayload.hero_background_url;
+        delete fallbackPayload.hero_title;
+        delete fallbackPayload.hero_subtitle;
+
+        const fallbackRes = await client.from('church_info').upsert(fallbackPayload);
+        if (!fallbackRes.error) {
+          return {
+            success: true,
+            message: 'Informações da igreja salvas localmente e sincronizadas. Execute o comando SQL no Supabase para salvar as colunas de imagens na nuvem.'
+          };
+        }
+      }
+      return { success: false, message: error.message };
+    }
+    
+    return { success: true };
   },
 
   async upsertSchedule(schedule: WeeklySchedule) {
